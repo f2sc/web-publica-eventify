@@ -1,0 +1,25 @@
+# Eventify
+
+Plataforma de fidelización QR para el comercio local español.
+
+Eventify permite a los comercios locales captar y fidelizar clientes mediante un código QR sin necesidad de app. Los clientes escanean el QR, se registran con nombre y teléfono, y reciben notificaciones push con ofertas y novedades.
+
+## Páginas principales
+
+- [Inicio](https://www.eventify.es)
+- [Cómo funciona](https://www.eventify.es/como-funciona)
+- [Para comercios](https://www.eventify.es/para-comercios)
+- [Para asociaciones](https://www.eventify.es/para-asociaciones)
+- [Blog](https://www.eventify.es/blog)
+- [Directorio de localidades](https://www.eventify.es/localidades)
+
+## API pública
+
+- [Comercios](https://app.eventify.es/api/public/comercios)
+- [Localidades](https://app.eventify.es/api/public/localidades)
+- [Categorías](https://app.eventify.es/api/public/categorias)
+
+## Aplicación
+
+- [Panel de gestión](https://app.eventify.es)
+- [Registro de comercio](https://app.eventify.es/qr)
