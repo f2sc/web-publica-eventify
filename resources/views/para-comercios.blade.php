@@ -2,17 +2,19 @@
 
 @section('content')
 
-<section class="hero">
-    <div class="hero-container">
-        <span class="hero-badge">Para comercios</span>
+<div class="sub-hero">
+    <div class="sub-hero-bg" style="background-image:url('{{ asset('images/big/comerciante-movil-tienda-local-eventify.png') }}');background-position:center center;"></div>
+    <div class="sub-hero-ov"></div>
+    <div class="sub-hero-cnt">
+        <div class="sub-ey">Para comercios</div>
         <h1>Consigue que tus clientes vuelvan.</h1>
         <p>Con Eventify, cada cliente que entra puede convertirse en un cliente fiel. Sin app, sin tarjetas, sin complicaciones.</p>
-        <div class="hero-ctas">
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.5rem;">
             <a href="{{ $appUrl }}/qr?source=para-comercios&tipo=general" class="btn btn-accent">Crear mi QR gratis</a>
-            <a href="{{ url('/como-funciona') }}" class="btn btn-secondary" style="color:#fff;border-color:rgba(255,255,255,.5)">Cómo funciona</a>
+            <a href="{{ url('/como-funciona') }}" class="btn" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.88);border:1.5px solid rgba(255,255,255,.28);">Cómo funciona</a>
         </div>
     </div>
-</section>
+</div>
 
 <section class="section">
     <div class="container">

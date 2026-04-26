@@ -2,16 +2,18 @@
 
 @section('content')
 
-<section class="hero">
-    <div class="hero-container">
-        <span class="hero-badge">Para asociaciones y ayuntamientos</span>
+<div class="sub-hero">
+    <div class="sub-hero-bg" style="background-image:url('{{ asset('images/big/asociacion-gestora-comercios-barrio-eventify.png') }}');background-position:center 25%;"></div>
+    <div class="sub-hero-ov"></div>
+    <div class="sub-hero-cnt">
+        <div class="sub-ey">Para asociaciones y ayuntamientos</div>
         <h1>Digitaliza el comercio de tu barrio.</h1>
         <p>Eventify ofrece a asociaciones de comerciantes y ayuntamientos una herramienta colectiva de fidelización. Una plataforma, todos los comercios.</p>
-        <div class="hero-ctas">
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.5rem;">
             <a href="{{ $appUrl }}/qr?source=para-asociaciones" class="btn btn-accent">Solicitar demo</a>
         </div>
     </div>
-</section>
+</div>
 
 <section class="section">
     <div class="container">

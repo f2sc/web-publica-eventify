@@ -2,13 +2,15 @@
 
 @section('content')
 
-<section class="hero">
-    <div class="hero-container">
-        <span class="hero-badge">Guía rápida</span>
+<div class="sub-hero">
+    <div class="sub-hero-bg" style="background-image:url('{{ asset('images/big/cafeteria-barrio-qr-captacion-clientes-eventify.png') }}');background-position:center 30%;"></div>
+    <div class="sub-hero-ov"></div>
+    <div class="sub-hero-cnt">
+        <div class="sub-ey">Guía rápida</div>
         <h1>Cómo funciona Eventify</h1>
         <p>Fidelización QR en 3 pasos, sin app, sin fricciones.</p>
     </div>
-</section>
+</div>
 
 <section class="section">
     <div class="container">
