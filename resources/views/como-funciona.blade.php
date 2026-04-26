@@ -96,7 +96,7 @@
         </div>
 
         <div style="text-align:center;margin-top:3rem">
-            <a href="https://app.eventify.es/qr?source=como-funciona" class="btn btn-primary btn-lg">Empezar gratis ahora</a>
+            <a href="{{ $appUrl }}/qr?source=como-funciona" class="btn btn-primary btn-lg">Empezar gratis ahora</a>
         </div>
     </div>
 </section>

@@ -33,6 +33,7 @@ return [
 
     'eventify' => [
         'api_url'     => env('EVENTIFY_API_URL'),
+        'app_url'     => env('EVENTIFY_APP_URL', 'https://app.eventify.es'),
         'cms_login'   => env('EVENTIFY_API_CMS_LOGIN'),
         'cms_logout'  => env('EVENTIFY_API_CMS_LOGOUT'),
     ],

@@ -8,7 +8,7 @@
         <h1>Digitaliza el comercio de tu barrio.</h1>
         <p>Eventify ofrece a asociaciones de comerciantes y ayuntamientos una herramienta colectiva de fidelización. Una plataforma, todos los comercios.</p>
         <div class="hero-ctas">
-            <a href="https://app.eventify.es/qr?source=para-asociaciones" class="btn btn-accent">Solicitar demo</a>
+            <a href="{{ $appUrl }}/qr?source=para-asociaciones" class="btn btn-accent">Solicitar demo</a>
         </div>
     </div>
 </section>
@@ -64,7 +64,7 @@
     <div class="container">
         <h2 class="section-title">¿Quieres una demo para tu asociación?</h2>
         <p class="section-subtitle" style="margin:0 auto 2.5rem">Te mostramos cómo funciona adaptado a tu caso concreto.</p>
-        <a href="https://app.eventify.es/qr?source=para-asociaciones-cta" class="btn btn-primary" style="font-size:1.1rem;padding:1rem 2.5rem">Solicitar demo gratuita →</a>
+        <a href="{{ $appUrl }}/qr?source=para-asociaciones-cta" class="btn btn-primary" style="font-size:1.1rem;padding:1rem 2.5rem">Solicitar demo gratuita →</a>
     </div>
 </section>
 

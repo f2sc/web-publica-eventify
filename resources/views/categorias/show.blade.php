@@ -35,7 +35,7 @@
         </div>
         <div style="margin-top:2rem;padding:2rem;background:#fff;border-radius:12px;border:1px solid #e5e7eb">
             <h3 style="margin-bottom:0.75rem">¿Tienes un {{ rtrim($nombre, 's') }}? Únete gratis</h3>
-            <a href="https://app.eventify.es/qr?source=categoria&tipo={{ $slug }}" class="btn btn-primary">Registrar mi negocio</a>
+            <a href="{{ $appUrl }}/qr?source=categoria&tipo={{ $slug }}" class="btn btn-primary">Registrar mi negocio</a>
         </div>
     </div>
 </section>

@@ -8,7 +8,7 @@
         <h1>Consigue que tus clientes vuelvan.</h1>
         <p>Con Eventify, cada cliente que entra puede convertirse en un cliente fiel. Sin app, sin tarjetas, sin complicaciones.</p>
         <div class="hero-ctas">
-            <a href="https://app.eventify.es/qr?source=para-comercios&tipo=general" class="btn btn-accent">Crear mi QR gratis</a>
+            <a href="{{ $appUrl }}/qr?source=para-comercios&tipo=general" class="btn btn-accent">Crear mi QR gratis</a>
             <a href="{{ url('/como-funciona') }}" class="btn btn-secondary" style="color:#fff;border-color:rgba(255,255,255,.5)">Cómo funciona</a>
         </div>
     </div>
@@ -58,7 +58,7 @@
     <div class="container" style="text-align:center">
         <h2 class="section-title">Empieza hoy mismo</h2>
         <p class="section-subtitle" style="margin:0 auto 2.5rem">Sin tarjeta de crédito. En 2 minutos tienes tu QR listo.</p>
-        <a href="https://app.eventify.es/qr?source=para-comercios-cta" class="btn btn-primary" style="font-size:1.1rem;padding:1rem 2.5rem">Crear mi QR gratis →</a>
+        <a href="{{ $appUrl }}/qr?source=para-comercios-cta" class="btn btn-primary" style="font-size:1.1rem;padding:1rem 2.5rem">Crear mi QR gratis →</a>
     </div>
 </section>
 
