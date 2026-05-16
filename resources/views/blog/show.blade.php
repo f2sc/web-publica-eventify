@@ -58,7 +58,7 @@
     <div class="container" style="text-align:center">
         <h2 style="font-size:1.4rem;margin-bottom:1rem">¿Tienes un comercio local?</h2>
         <p style="color:#6b7280;margin-bottom:1.5rem">Prueba Eventify gratis y empieza a fidelizar a tus clientes hoy mismo.</p>
-        <a href="{{ $appUrl }}/qr?source=blog-articulo" class="btn btn-primary">Crear mi QR gratis</a>
+        <a href="{{ $appUrl }}/register?source=blog-articulo" class="btn btn-primary">Registrarme gratis</a>
     </div>
 </section>
 

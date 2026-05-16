@@ -52,10 +52,24 @@ class EventifyApiService
         });
     }
 
+    public function asociaciones(): array
+    {
+        return Cache::remember('api_asociaciones', now()->addHours(2), function () {
+            return $this->get('/asociaciones');
+        });
+    }
+
     public function asociacion(string $slug): array
     {
         return Cache::remember("api_asociacion_{$slug}", now()->addHour(), function () use ($slug) {
             return $this->get("/asociaciones/{$slug}");
+        });
+    }
+
+    public function stats(): array
+    {
+        return Cache::remember('api_stats', now()->addHours(2), function () {
+            return $this->get('/stats');
         });
     }
 

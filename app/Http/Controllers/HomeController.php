@@ -10,8 +10,42 @@ class HomeController extends Controller
 
     public function index()
     {
-        $resp        = $this->api->localidades();
-        $localidades = collect($resp['data'] ?? $resp)->take(8)->values()->all();
+        try {
+            $resp        = $this->api->localidades();
+            $localidades = collect($resp['data'] ?? $resp)->take(8)->values()->all();
+        } catch (\Throwable $e) {
+            report($e);
+            $localidades = [];
+        }
+
+        try {
+            $respAsoc     = $this->api->asociaciones();
+            $asociaciones = collect($respAsoc['data'] ?? $respAsoc)->take(8)->values()->all();
+        } catch (\Throwable $e) {
+            report($e);
+            $asociaciones = [];
+        }
+
+        try {
+            $respCom  = $this->api->comercios();
+            $comercios = collect($respCom['data'] ?? $respCom)
+                ->filter(fn($c) => !empty($c['nombre_comercial']) && !empty($c['localidad']['nombre']))
+                ->shuffle()
+                ->take(3)
+                ->values()
+                ->all();
+        } catch (\Throwable $e) {
+            report($e);
+            $comercios = [];
+        }
+
+        try {
+            $statsResp = $this->api->stats();
+            $stats     = $statsResp['data'] ?? $statsResp;
+        } catch (\Throwable $e) {
+            report($e);
+            $stats = [];
+        }
 
         $schema = [
             '@context' => 'https://schema.org',
@@ -36,16 +70,30 @@ class HomeController extends Controller
         ];
 
         return view('home', [
-            'title'       => 'Fidelización QR para el comercio local',
-            'description' => 'Eventify conecta comercios locales con sus clientes mediante QR, notificaciones push y ofertas. Únete gratis.',
-            'canonical'   => url('/'),
-            'schema'      => $schema,
-            'localidades' => $localidades,
+            'title'        => 'Fidelización QR para el comercio local',
+            'description'  => 'Eventify conecta comercios locales con sus clientes mediante QR, notificaciones push y ofertas. Únete gratis.',
+            'canonical'    => url('/'),
+            'schema'       => $schema,
+            'localidades'  => $localidades,
+            'asociaciones' => $asociaciones,
+            'comercios'    => $comercios,
+            'stats'        => $stats,
         ]);
     }
 
     public function comoFunciona()
     {
+        try {
+            $respCom     = $this->api->comercios();
+            $comercioDemo = collect($respCom['data'] ?? $respCom)
+                ->filter(fn($c) => !empty($c['nombre_comercial']) && !empty($c['localidad']['nombre']))
+                ->shuffle()
+                ->first();
+        } catch (\Throwable $e) {
+            report($e);
+            $comercioDemo = null;
+        }
+
         $schema = [
             '@context'   => 'https://schema.org',
             '@type'      => 'FAQPage',
@@ -57,28 +105,105 @@ class HomeController extends Controller
         ];
 
         return view('como-funciona', [
-            'title'       => 'Cómo funciona Eventify',
-            'description' => 'Descubre cómo Eventify conecta comercios locales con sus clientes en 3 sencillos pasos: QR, registro y notificaciones.',
-            'canonical'   => url('/como-funciona'),
-            'schema'      => $schema,
+            'title'        => 'Cómo funciona Eventify',
+            'description'  => 'Descubre cómo Eventify conecta comercios locales con sus clientes en 3 sencillos pasos: QR, registro y notificaciones.',
+            'canonical'    => url('/como-funciona'),
+            'schema'       => $schema,
+            'comercioDemo' => $comercioDemo,
         ]);
     }
 
     public function paraComercios()
     {
+        try {
+            $statsResp = $this->api->stats();
+            $stats     = $statsResp['data'] ?? $statsResp;
+        } catch (\Throwable $e) {
+            report($e);
+            $stats = [];
+        }
+
+        try {
+            $respCom   = $this->api->comercios();
+            $comercios = collect($respCom['data'] ?? $respCom)
+                ->filter(fn($c) => !empty($c['nombre_comercial']))
+                ->values()->all();
+        } catch (\Throwable $e) {
+            report($e);
+            $comercios = [];
+        }
+
         return view('para-comercios', [
-            'title'       => 'Eventify para comercios — Fideliza a tus clientes con QR',
-            'description' => 'Consigue que tus clientes vuelvan con notificaciones push, ofertas y fidelización QR. Sin app, sin complicaciones.',
-            'canonical'   => url('/para-comercios'),
+            'title'      => 'Eventify para comercios — Fideliza a tus clientes con QR',
+            'description'=> 'Consigue que tus clientes vuelvan con notificaciones push, ofertas y fidelización QR. Sin app, sin complicaciones.',
+            'canonical'  => url('/para-comercios'),
+            'stats'      => $stats,
+            'comercios'  => $comercios,
         ]);
     }
 
     public function paraAsociaciones()
     {
+        try {
+            $resp     = $this->api->asociaciones();
+            $slugs    = collect($resp['data'] ?? $resp)->pluck('slug')->take(8)->all();
+            $asociaciones = collect($slugs)->map(function ($slug) {
+                try {
+                    $detail = $this->api->asociacion($slug);
+                    return $detail['data'] ?? $detail;
+                } catch (\Throwable $e) {
+                    return null;
+                }
+            })->filter()->values()->all();
+        } catch (\Throwable $e) {
+            report($e);
+            $asociaciones = [];
+        }
+
+        try {
+            $statsResp = $this->api->stats();
+            $stats     = $statsResp['data'] ?? $statsResp;
+        } catch (\Throwable $e) {
+            report($e);
+            $stats = [];
+        }
+
         return view('para-asociaciones', [
-            'title'       => 'Eventify para asociaciones de comerciantes',
-            'description' => 'Digitaliza el comercio de tu barrio o municipio con Eventify. Herramienta colectiva de fidelización para asociaciones y ayuntamientos.',
-            'canonical'   => url('/para-asociaciones'),
+            'title'        => 'Eventify para asociaciones de comerciantes',
+            'description'  => 'Digitaliza el comercio de tu barrio o municipio con Eventify. Herramienta colectiva de fidelización para asociaciones y ayuntamientos.',
+            'canonical'    => url('/para-asociaciones'),
+            'asociaciones' => $asociaciones,
+            'stats'        => $stats,
+        ]);
+    }
+
+    public function privacidad()
+    {
+        return view('legal.privacidad', [
+            'title'       => 'Política de privacidad — Eventify',
+            'description' => 'Política de privacidad de Eventify. Cómo recogemos, usamos y protegemos tus datos personales.',
+            'canonical'   => url('/privacidad'),
+            'indexable'   => false,
+        ]);
+    }
+
+    public function terminos()
+    {
+        return view('legal.terminos', [
+            'title'       => 'Términos y condiciones — Eventify',
+            'description' => 'Términos y condiciones de uso de la plataforma Eventify.',
+            'canonical'   => url('/terminos'),
+            'indexable'   => false,
+        ]);
+    }
+
+    public function cookies()
+    {
+        return view('legal.cookies', [
+            'title'       => 'Política de cookies — Eventify',
+            'description' => 'Política de cookies de Eventify. Información sobre las cookies que utilizamos.',
+            'canonical'   => url('/cookies'),
+            'indexable'   => false,
         ]);
     }
 }

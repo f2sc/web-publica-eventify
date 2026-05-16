@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LocalidadController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\SuscriptorController;
 use App\Http\Controllers\Admin\ArticuloController;
 use App\Http\Controllers\Admin\CmsAuthController;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,16 @@ Route::get('/localidades', [LocalidadController::class, 'index']);
 Route::get('/localidades/{loc}/{cat}', [LocalidadController::class, 'showConCategoria']);
 Route::get('/localidades/{slug}', [LocalidadController::class, 'show']);
 Route::get('/categorias/{slug}', [CategoriaController::class, 'show']);
+
+// Páginas legales
+Route::get('/privacidad', [HomeController::class, 'privacidad']);
+Route::get('/terminos',   [HomeController::class, 'terminos']);
+Route::get('/cookies',    [HomeController::class, 'cookies']);
+
+// Newsletter
+Route::post('/newsletter/suscribir',      [SuscriptorController::class, 'store']);
+Route::get('/newsletter/confirmar/{token}', [SuscriptorController::class, 'confirmar']);
+Route::get('/newsletter/cancelar/{token}',  [SuscriptorController::class, 'cancelar']);
 
 // SEO infrastructure
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');

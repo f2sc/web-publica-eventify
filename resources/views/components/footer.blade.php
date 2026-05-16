@@ -13,7 +13,7 @@
                 <li><a href="{{ url('/como-funciona') }}">Cómo funciona</a></li>
                 <li><a href="{{ url('/para-comercios') }}">Para comercios</a></li>
                 <li><a href="{{ url('/para-asociaciones') }}">Para asociaciones</a></li>
-                <li><a href="{{ $appUrl }}/qr?source=footer">Registrar comercio</a></li>
+                <li><a href="{{ $appUrl }}/register?source=footer">Registrar comercio</a></li>
             </ul>
         </div>
 
@@ -39,9 +39,9 @@
     <div class="footer-bottom">
         <p class="footer-copy">&copy; {{ date('Y') }} Eventify. Todos los derechos reservados.</p>
         <div class="footer-legal">
-            <a href="#">Privacidad</a>
-            <a href="#">Términos</a>
-            <a href="#">Cookies</a>
+            <a href="{{ url('/privacidad') }}">Privacidad</a>
+            <a href="{{ url('/terminos') }}">Términos</a>
+            <a href="{{ url('/cookies') }}">Cookies</a>
         </div>
     </div>
 </footer>

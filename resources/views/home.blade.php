@@ -8,28 +8,36 @@
         <div class="hero-left-inner">
             <div class="hero-badge">
                 <span class="badge-dot"></span>
-                +1.200 comercios activos en España
+                {{ isset($stats['comercios']) ? $stats['comercios'] . ' comercios' : 'Comercios' }} activos en España
             </div>
             <h1>Tu barrio<br>está esperando<br><mark>tu próxima oferta.</mark></h1>
             <p class="hero-sub">Un QR en tu escaparate. Tus clientes se registran con el móvil. Tú les envías notificaciones que de verdad abren. Sin apps. Sin complicaciones.</p>
             <div class="hero-actions">
-                <a href="{{ $appUrl }}/qr?source=web-hero" class="btn btn-accent">&#x25B6;&nbsp; Crear mi QR gratis</a>
+                <a href="{{ $appUrl }}/register?source=web-hero" class="btn btn-accent">&#x25B6;&nbsp; Registrarme gratis</a>
                 <a href="{{ url('/como-funciona') }}" class="btn" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.88);border:1.5px solid rgba(255,255,255,.28);">Ver cómo funciona</a>
             </div>
+            @if(!empty($stats))
             <div class="hero-stats">
+                @if(isset($stats['comercios']))
                 <div class="hstat">
-                    <div class="hstat-num">+1.200</div>
+                    <div class="hstat-num">{{ number_format($stats['comercios']) }}</div>
                     <div class="hstat-lbl">Comercios activos</div>
                 </div>
+                @endif
+                @if(isset($stats['clientes']))
                 <div class="hstat">
-                    <div class="hstat-num">48.000</div>
-                    <div class="hstat-lbl">Clientes captados</div>
+                    <div class="hstat-num">{{ number_format($stats['clientes']) }}</div>
+                    <div class="hstat-lbl">Clientes registrados</div>
                 </div>
+                @endif
+                @if(isset($stats['localidades']))
                 <div class="hstat">
-                    <div class="hstat-num">23%</div>
-                    <div class="hstat-lbl">Apertura media</div>
+                    <div class="hstat-num">{{ number_format($stats['localidades']) }}</div>
+                    <div class="hstat-lbl">{{ $stats['localidades'] == 1 ? 'Localidad activa' : 'Localidades activas' }}</div>
                 </div>
+                @endif
             </div>
+            @endif
         </div>
     </div>
 
@@ -68,11 +76,15 @@
     <div class="trust-inner">
         <span class="trust-lbl">Confían en nosotros:</span>
         <div class="trust-logos">
+            @forelse($asociaciones as $asoc)
+            <div class="trust-logo">&#x1F3DB; {{ $asoc['nombre'] }}{{ isset($asoc['localidad']) ? ' · ' . $asoc['localidad'] : '' }}</div>
+            @empty
             <div class="trust-logo">&#x1F3EA; Asoc. Comercio Leganés</div>
             <div class="trust-logo">&#x1F3D9; Ayto. Coslada</div>
             <div class="trust-logo">&#x1F3EA; Comerciantes Getafe</div>
             <div class="trust-logo">&#x1F3D9; Ayto. Fuenlabrada</div>
             <div class="trust-logo">&#x1F3EA; Comercios Badalona</div>
+            @endforelse
         </div>
     </div>
 </div>
@@ -80,50 +92,57 @@
 {{-- HISTORIAS REALES --}}
 <section class="section" style="background:var(--warm);overflow:hidden;">
     <div class="container">
-        <div class="eyebrow">Historias reales</div>
-        <h2 class="section-title">El barrio que ya usa Eventify</h2>
-        <p class="section-subtitle">Comercios como el tuyo que pasaron de cero clientes digitales a cientos de contactos en semanas.</p>
+        <div class="eyebrow">Lo que dicen</div>
+        <h2 class="section-title">Así lo están viviendo</h2>
+        <p class="section-subtitle">Comercios que pasaron de cero clientes digitales a cientos de contactos en semanas.</p>
 
+        @php
+        $stories = [
+            [
+                'img'   => asset('images/big/cafeteria-barrio-fidelizacion-clientes.jpg'),
+                'cat'   => '☕ Cafetería',
+                'quote' => '"En 3 semanas tenía 400 clientes en mi lista"',
+                'desc'  => 'Puso el QR en el mostrador. Sus clientes lo escanean mientras esperan el pedido.',
+                'icon'  => '☕',
+                'name'  => 'María G.',
+                'role'  => 'Cafetería · Madrid',
+            ],
+            [
+                'img'   => asset('images/big/peluqueria-barrio-notificaciones-push.jpg'),
+                'cat'   => '✂️ Peluquería',
+                'quote' => '"Mis clientes vuelven cuando les mando un descuento"',
+                'desc'  => 'Envía una oferta flash cada semana. Llena la agenda sin esfuerzo.',
+                'icon'  => '✂️',
+                'name'  => 'Carlos R.',
+                'role'  => 'Barbería · Getafe',
+            ],
+            [
+                'img'   => asset('images/big/restaurante-local-captacion-clientes.jpg'),
+                'cat'   => '🏛 Asociación',
+                'quote' => '"El ayuntamiento nos puso de ejemplo digital"',
+                'desc'  => 'La asociación se apuntó completa. Muchos comercios, una sola herramienta.',
+                'icon'  => '🏛',
+                'name'  => 'Pedro S.',
+                'role'  => 'Asociación · Fuenlabrada',
+            ],
+        ];
+        @endphp
         <div class="stories-grid">
+            @foreach($stories as $s)
             <div class="story-card">
-                <img src="{{ asset('images/big/cafeteria-barrio-fidelizacion-clientes.jpg') }}" alt="Cafetería con fidelización Eventify" loading="lazy">
+                <img src="{{ $s['img'] }}" alt="Comercio local usando Eventify" loading="lazy">
                 <div class="story-overlay"></div>
                 <div class="story-content">
-                    <div class="story-cat">&#x2615; Cafetería</div>
-                    <h3>"En 3 semanas tenía 400 clientes en mi lista"</h3>
-                    <p>María puso el QR en la barra. Sus clientes lo escanean esperando el café.</p>
+                    <div class="story-cat">{{ $s['cat'] }}</div>
+                    <h3>{{ $s['quote'] }}</h3>
+                    <p>{{ $s['desc'] }}</p>
                     <div class="story-meta">
-                        <div class="story-avatar">&#x2615;</div>
-                        <div class="story-who">María G. — Café El Rincón, Coslada</div>
+                        <div class="story-avatar">{{ $s['icon'] }}</div>
+                        <div class="story-who">{{ $s['name'] }} &mdash; {{ $s['role'] }}</div>
                     </div>
                 </div>
             </div>
-            <div class="story-card">
-                <img src="{{ asset('images/big/peluqueria-barrio-notificaciones-push.jpg') }}" alt="Peluquería con notificaciones push Eventify" loading="lazy">
-                <div class="story-overlay"></div>
-                <div class="story-content">
-                    <div class="story-cat">&#x2702; Peluquería</div>
-                    <h3>"Mis clientes vuelven cuando les mando un descuento"</h3>
-                    <p>Carlos envía una oferta flash cada viernes. El lunes llena la agenda.</p>
-                    <div class="story-meta">
-                        <div class="story-avatar">&#x1F488;</div>
-                        <div class="story-who">Carlos R. — Barber House, Getafe</div>
-                    </div>
-                </div>
-            </div>
-            <div class="story-card">
-                <img src="{{ asset('images/big/restaurante-local-captacion-clientes.jpg') }}" alt="Restaurante local con Eventify" loading="lazy">
-                <div class="story-overlay"></div>
-                <div class="story-content">
-                    <div class="story-cat">&#x1F374; Restaurante</div>
-                    <h3>"El ayuntamiento nos puso de ejemplo digital"</h3>
-                    <p>La asociación se apuntó completa. 18 comercios, una sola herramienta.</p>
-                    <div class="story-meta">
-                        <div class="story-avatar">&#x1F3DB;</div>
-                        <div class="story-who">Ana M. — Asoc. Comercio Leganés</div>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
     </div>
 </section>
@@ -180,7 +199,7 @@
                 <div class="how-copy">
                     <div class="how-step-num">02</div>
                     <h3>Tus clientes se registran solos</h3>
-                    <p>Escanean el QR con el móvil, dejan su nombre y móvil y en 30 segundos están en tu base de datos. Sin instalar ninguna app.</p>
+                    <p>Escanean el QR con el móvil, dejan su nombre y móvil y en 30 segundos están registrados en Eventify. Sin instalar ninguna app.</p>
                     <div class="how-detail">
                         <div class="how-detail-item"><div class="how-detail-icon">&#x2713;</div>Sin descargar ninguna app</div>
                         <div class="how-detail-item"><div class="how-detail-icon">&#x2713;</div>Consentimiento RGPD incluido</div>
@@ -209,74 +228,202 @@
     </div>
 </section>
 
-{{-- BENEFICIOS --}}
-<section class="section" style="background:var(--surface);">
-    <div class="container">
-        <div style="text-align:center;margin-bottom:3rem;">
-            <div class="eyebrow" style="justify-content:center;">Por qué funciona</div>
-            <h2 class="section-title">Todo lo que necesita tu negocio</h2>
+{{-- ESCAPARATE DIGITAL --}}
+<section class="pagcom-sec">
+    <div class="pagcom-inner">
+        <div class="pagcom-copy">
+            <div class="eyebrow">&#x1F3EA; Tu escaparate digital</div>
+            <h2 class="section-title">Al registrarte, tu página de comercio se crea sola</h2>
+            <p class="section-subtitle">Sin diseñadores, sin webs de terceros. Solo pon el nombre y logotipo de tu comercio y tendrás una página pública lista para compartir.</p>
+            <div class="pagcom-features">
+                <div class="pagcom-feat">
+                    <div class="pagcom-feat-ico">&#x1F381;</div>
+                    <div class="pagcom-feat-txt">
+                        <strong>Ofertas en tiempo real</strong>
+                        <span>Tus clientes ven siempre tus promociones activas.</span>
+                    </div>
+                </div>
+                <div class="pagcom-feat">
+                    <div class="pagcom-feat-ico">&#x2B50;</div>
+                    <div class="pagcom-feat-txt">
+                        <strong>Fidelización integrada</strong>
+                        <span>El programa de puntos aparece directamente en tu página.</span>
+                    </div>
+                </div>
+                <div class="pagcom-feat">
+                    <div class="pagcom-feat-ico">&#x1F5BC;</div>
+                    <div class="pagcom-feat-txt">
+                        <strong>Galería de productos</strong>
+                        <span>Muestra tus platos, productos o servicios estrella.</span>
+                    </div>
+                </div>
+                <div class="pagcom-feat">
+                    <div class="pagcom-feat-ico">&#x1F31F;</div>
+                    <div class="pagcom-feat-txt">
+                        <strong>Reseñas Google</strong>
+                        <span>Tus valoraciones de Google aparecen automáticamente.</span>
+                    </div>
+                </div>
+                <div class="pagcom-feat">
+                    <div class="pagcom-feat-ico">&#x1F4CD;</div>
+                    <div class="pagcom-feat-txt">
+                        <strong>Mapa y horarios</strong>
+                        <span>Dirección, teléfono y horario siempre visibles.</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="bene-grid">
-            <div class="bene">
-                <div class="bene-icon">&#x1F4F2;</div>
-                <h3>Captación sin fricciones</h3>
-                <p>El cliente se registra en 10 segundos con solo su nombre y teléfono. Tu base de datos crece sola.</p>
-            </div>
-            <div class="bene feat">
-                <div class="bene-icon">&#x1F514;</div>
-                <h3>Notificaciones directas</h3>
-                <p>Llega al móvil de tus clientes cuando publicas una oferta. Sin algoritmos que filtren tu mensaje.</p>
-            </div>
-            <div class="bene">
-                <div class="bene-icon">&#x1F4CA;</div>
-                <h3>Panel en tiempo real</h3>
-                <p>Sabe cuántos clientes tienes, cuándo fueron la última vez y qué campañas funcionan mejor.</p>
-            </div>
-            <div class="bene">
-                <div class="bene-icon">&#x1F91D;</div>
-                <h3>Red local colaborativa</h3>
-                <p>Comparte clientes con comercios de tu zona y benefíciate de la red de tu asociación.</p>
-            </div>
-            <div class="bene">
-                <div class="bene-icon">&#x1F3AF;</div>
-                <h3>Segmentación precisa</h3>
-                <p>Envía ofertas solo a clientes que no han visitado en 30 días, o a los más fieles. Tú decides.</p>
-            </div>
-            <div class="bene">
-                <div class="bene-icon">&#x1F4B6;</div>
-                <h3>Asequible desde el día 1</h3>
-                <p>Plan gratuito para empezar. Sin permanencia, sin comisiones. Pagas solo si creces.</p>
+
+        <div class="pagcom-visual">
+            <div class="pagcom-browser">
+                <div class="pagcom-browser-bar">
+                    <span class="pagcom-dot" style="background:#ff5f57"></span>
+                    <span class="pagcom-dot" style="background:#febc2e"></span>
+                    <span class="pagcom-dot" style="background:#28c840"></span>
+                    <span class="pagcom-url">app.eventify.es/comercio/cafe-el-rincon</span>
+                </div>
+                <div class="pagcom-screen">
+                    <div class="pc2-hero-img">
+                        <img src="{{ asset('images/big/cafeteria-barrio-fidelizacion-clientes.jpg') }}"
+                             alt="Página de comercio en Eventify" loading="lazy"
+                             style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+                    </div>
+                    <div class="pc2-card" style="display:flex;align-items:center;gap:10px;">
+                        <div class="pc2-logo">&#x2615;</div>
+                        <div>
+                            <strong style="display:block;font-size:13px;">Café El Rincón</strong>
+                            <span class="pc2-pill" style="background:#f3f4f6;">&#x2615; Cafetería &middot; Coslada</span>
+                        </div>
+                    </div>
+                    <div class="pc2-nav">
+                        <span class="pc2-pill" style="background:var(--brand);color:#fff;">Ofertas</span>
+                        <span class="pc2-pill">Fidelización</span>
+                        <span class="pc2-pill">Galería</span>
+                        <span class="pc2-pill">Info</span>
+                    </div>
+                    <div class="pc2-sec">
+                        <strong style="font-size:.65rem;color:#374151;">Ofertas activas</strong>
+                        <div class="pc2-offers">
+                            <div class="pc2-offer-card">
+                                <div style="font-size:.75rem;font-weight:700;">&#x2615; 2&times;1 en café</div>
+                                <div style="font-size:.6rem;color:#6b7280;">Hoy hasta las 11h</div>
+                            </div>
+                            <div class="pc2-offer-card">
+                                <div style="font-size:.75rem;font-weight:700;">&#x1F950; Desayuno -20%</div>
+                                <div style="font-size:.6rem;color:#6b7280;">Nuevos clientes</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pc2-loyalty" style="background:var(--grad-brand);">
+                        <div class="pc2-loyalty-pat"></div>
+                        <strong style="font-size:.65rem;color:rgba(255,255,255,.8);display:block;margin-bottom:8px;">Tu fidelización</strong>
+                        <div class="pc2-stamps-grid">
+                            <div class="pc2-stamp filled">&#x2713;</div>
+                            <div class="pc2-stamp filled">&#x2713;</div>
+                            <div class="pc2-stamp filled">&#x2713;</div>
+                            <div class="pc2-stamp">4</div>
+                            <div class="pc2-stamp">5</div>
+                        </div>
+                        <div class="pc2-progress">
+                            <div class="pc2-progress-bar" style="width:60%"></div>
+                        </div>
+                        <div class="pc2-loyalty-foot" style="color:rgba(255,255,255,.7);font-size:.65rem;">3 de 5 visitas &rarr; caf&eacute; gratis</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
+{{-- BENEFICIOS CON TABS --}}
+<section class="section" style="background:var(--surface);">
+    <div class="container">
+        <div style="text-align:center;margin-bottom:3rem;">
+            <div class="eyebrow" style="justify-content:center;">Para todos</div>
+            <h2 class="section-title">Un ecosistema para todo el barrio</h2>
+        </div>
+        <div class="tab-row">
+            <button class="tab-btn on" onclick="swTab(this,'tb-c')">&#x1F3EA; Comercios</button>
+            <button class="tab-btn" onclick="swTab(this,'tb-cl')">&#x1F465; Clientes</button>
+            <button class="tab-btn" onclick="swTab(this,'tb-a')">&#x1F3DB; Asociaciones</button>
+        </div>
+        <div id="tb-c" class="bene-tab-panel on">
+            <div class="bene feat"><div class="bene-icon">&#x1F5C3;</div><h3>Tus clientes, sin intermediarios.</h3><p>Sin depender de Instagram ni de algoritmos. Cada escaneo suma un contacto directo al que puedes llegar siempre.</p></div>
+            <div class="bene"><div class="bene-icon">&#x1F3AF;</div><h3>Notificaciones segmentadas</h3><p>Envía solo a quien le importa: por zona, tipo de cliente o fecha de última visita.</p></div>
+            <div class="bene"><div class="bene-icon">&#x1F4C8;</div><h3>Analítica real, sin rodeos</h3><p>Cuántos clientes, qué tasa de apertura, qué campañas funcionan. Datos claros para decidir mejor.</p></div>
+            <div class="bene"><div class="bene-icon">&#x1F382;</div><h3>Automatizaciones que fidelizan</h3><p>Cumpleaños automáticos, mensajes de bienvenida, recordatorios de visita. Solo se configuran una vez.</p></div>
+            <div class="bene"><div class="bene-icon">&#x1F4F1;</div><h3>El cliente no instala nada</h3><p>Solo el móvil y la cámara. Sin barreras. Así se registran el 90% de las personas que escanean.</p></div>
+            <div class="bene"><div class="bene-icon">&#x26A1;</div><h3>Panel en español, sin curva</h3><p>Si sabes usar WhatsApp, sabes usar Eventify. Pensado para el dueño, no para un informático.</p></div>
+        </div>
+        <div id="tb-cl" class="bene-tab-panel">
+            <div class="bene feat"><div class="bene-icon">&#x1F381;</div><h3>Las mejores ofertas de tu barrio</h3><p>Recibe solo lo que te interesa, de los comercios que eliges. Sin ruido de grandes superficies.</p></div>
+            <div class="bene"><div class="bene-icon">&#x1F6E1;</div><h3>Tú decides siempre</h3><p>Te das de baja de cualquier comercio con un clic. Tú mandas sobre tus notificaciones.</p></div>
+            <div class="bene"><div class="bene-icon">&#x2764;</div><h3>Apoya el comercio local</h3><p>Cada escaneo hace crecer el comercio de tu barrio y te da ventajas que los grandes nunca te darán.</p></div>
+        </div>
+        <div id="tb-a" class="bene-tab-panel">
+            <div class="bene feat"><div class="bene-icon">&#x1F3DB;</div><h3>Panel para toda la asociación</h3><p>Gestiona todos tus comercios desde un único lugar. Campañas conjuntas, métricas globales.</p></div>
+            <div class="bene"><div class="bene-icon">&#x1F4CA;</div><h3>Datos para el ayuntamiento</h3><p>Informes reales de actividad para justificar vuestra labor y acceder a subvenciones de digitalización.</p></div>
+            <div class="bene"><div class="bene-icon">&#x1F3D9;</div><h3>Modelo B2B2G</h3><p>Eventify es la infraestructura digital del comercio de proximidad. Comercios + Asociación + Ayuntamiento.</p></div>
+        </div>
+    </div>
+</section>
+
+{{-- POSTER SECTION --}}
+<div class="poster-sec">
+    <div class="poster-sec-bg" style="background-image:url('{{ asset('images/big/comerciante-cartel-qr-impreso-eventify.png') }}');"></div>
+    <div class="poster-sec-ov"></div>
+    <div class="poster-sec-inner">
+        <div class="poster-copy">
+            <div class="eyebrow">&#x1F4CB; Tu cartel QR</div>
+            <h2 class="section-title">De digital a físico<br>en un clic.</h2>
+            <p>Eventify genera automáticamente un cartel profesional con tu QR personalizado. Lo descargas, lo imprimes con tu propia impresora y lo pones en el mostrador. Luego animas a cada cliente a escanearlo — así puedes avisarles cuando tengas algo para ellos y conseguir que vuelvan.</p>
+            <a href="{{ $appUrl }}/register?source=poster" class="btn btn-accent" style="display:inline-flex;gap:8px;align-items:center;">&#x2B; Regístrate y descarga mi cartel</a>
+        </div>
+        <div class="poster-imgs">
+            <div class="pimg tall"><img src="{{ asset('images/mockup-poster-en-soporte-metacrilato-color.jpg') }}" alt="Cartel QR Eventify en soporte metacrilato" loading="lazy"></div>
+            <div class="pimg"><img src="{{ asset('images/mockup-poster-color.jpg') }}" alt="Cartel QR Eventify en color" loading="lazy"></div>
+            <div class="pimg"><img src="{{ asset('images/mockup-poster-BYN.jpg') }}" alt="Cartel QR Eventify en blanco y negro" loading="lazy"></div>
+        </div>
+    </div>
+</div>
+
 {{-- LOCALIDADES --}}
 @if(count($localidades) > 0)
 <div class="loc-dark">
     <div class="container">
-        <div class="eyebrow">Dónde estamos</div>
-        <h2 class="section-title">Comercios adheridos en tu zona</h2>
-        <p class="section-subtitle">Localidades donde ya usamos Eventify. ¿Está la tuya?</p>
+        <div class="eyebrow">Cobertura</div>
+        <h2 class="section-title">Activo en toda España</h2>
+        <p class="section-subtitle">Tu localidad probablemente ya está aquí.</p>
     </div>
+    @php
+    $staticLocs = ['Getafe','Leganés','Alcorcón','Móstoles','Fuenlabrada','Torrejón de Ardoz','Alcalá de Henares','Hospitalet','Terrassa','Sabadell','Badalona','Mataró','Gijón','Oviedo','Murcia','Alicante','Granada','Valladolid','Zaragoza','Málaga'];
+    $realSlugs  = collect($localidades)->pluck('nombre')->map(fn($n) => strtolower($n))->all();
+    $extras     = array_filter($staticLocs, fn($n) => !in_array(strtolower($n), $realSlugs));
+    @endphp
     <div class="marquee-wrap" style="margin-top:2.75rem;">
         <div class="marquee-track">
             @foreach($localidades as $loc)
-            <a href="{{ url('/localidades/' . ($loc['slug'] ?? '')) }}" class="loc-chip">
-                {{ $loc['nombre'] ?? $loc['name'] ?? '' }}
+            <a href="{{ url('/localidades/' . ($loc['slug'] ?? '')) }}" class="loc-chip loc-chip-real">
+                &#x1F4CD; {{ $loc['nombre'] ?? $loc['name'] ?? '' }}
                 @if(isset($loc['num_comercios']))
-                    <span class="loc-chip-count">{{ $loc['num_comercios'] }}</span>
+                <span class="loc-chip-count">{{ $loc['num_comercios'] }}</span>
                 @endif
             </a>
             @endforeach
+            @foreach($extras as $ciudad)
+            <span class="loc-chip loc-chip-prox">&#x1F4CD; {{ $ciudad }}</span>
+            @endforeach
             {{-- Duplicar para loop infinito --}}
             @foreach($localidades as $loc)
-            <a href="{{ url('/localidades/' . ($loc['slug'] ?? '')) }}" class="loc-chip" aria-hidden="true">
-                {{ $loc['nombre'] ?? $loc['name'] ?? '' }}
+            <a href="{{ url('/localidades/' . ($loc['slug'] ?? '')) }}" class="loc-chip loc-chip-real" aria-hidden="true">
+                &#x1F4CD; {{ $loc['nombre'] ?? $loc['name'] ?? '' }}
                 @if(isset($loc['num_comercios']))
-                    <span class="loc-chip-count">{{ $loc['num_comercios'] }}</span>
+                <span class="loc-chip-count">{{ $loc['num_comercios'] }}</span>
                 @endif
             </a>
+            @endforeach
+            @foreach($extras as $ciudad)
+            <span class="loc-chip loc-chip-prox" aria-hidden="true">&#x1F4CD; {{ $ciudad }}</span>
             @endforeach
         </div>
     </div>
@@ -286,23 +433,129 @@
 </div>
 @endif
 
+{{-- TESTIMONIOS --}}
+<section class="test-sec">
+    <div class="container">
+        <div class="eyebrow">Testimonios</div>
+        <h2 class="section-title">Comercios que ya lo<br>están notando.</h2>
+        <div class="test-featured">
+            <div class="tcard-big">
+                <div class="test-stars">&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</div>
+                <p>"Antes mandaba mensajes de WhatsApp uno a uno. Ahora en 2 minutos lanzo una campaña a 400 clientes y el mismo día viene gente al local."</p>
+                <div class="tauthor">
+                    <div class="tavatar">&#x2615;</div>
+                    <div>
+                        <div class="tname">María González</div>
+                        <div class="trole">Café El Rincón &mdash; Coslada</div>
+                    </div>
+                </div>
+            </div>
+            <div class="tcard-big">
+                <div class="test-stars">&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</div>
+                <p>"Lo del QR parece una tontería pero es lo que más ha sorprendido a mis clientes. 'Qué moderno'. Y ya tengo 280 contactos registrados en Eventify."</p>
+                <div class="tauthor">
+                    <div class="tavatar">&#x1F488;</div>
+                    <div>
+                        <div class="tname">Carlos Ruiz</div>
+                        <div class="trole">Barber House Pro &mdash; Getafe</div>
+                    </div>
+                </div>
+            </div>
+            <div class="tcard-big big2">
+                <p>"La tasa de apertura del 23% de media. Mi agencia de marketing me cobraba el triple por peores resultados con email marketing."</p>
+                <div class="tauthor">
+                    <div class="tavatar">&#x1F33F;</div>
+                    <div>
+                        <div class="tname">Pedro Sánchez</div>
+                        <div class="trole">Herbolario Natura &mdash; Fuenlabrada</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- PRECIOS --}}
+<section class="price-sec">
+    <div class="container">
+        <div style="text-align:center;">
+            <div class="eyebrow" style="justify-content:center;">Precios</div>
+            <h2 class="section-title">Empieza gratis. Sin sorpresas.</h2>
+            <p class="section-subtitle" style="margin:0 auto;">Sin contratos. Sin comisiones. Cancela cuando quieras.</p>
+        </div>
+        <div class="price-grid">
+            <div class="pcard">
+                <div class="pname">Free</div>
+                <div class="pprice">0&euro; <small>/mes</small></div>
+                <p class="pdesc">Para empezar hoy mismo sin coste.</p>
+                <ul class="pfeats">
+                    <li><span class="pchk">&#x2713;</span>1 QR de comercio</li>
+                    <li><span class="pchk">&#x2713;</span>Hasta 500 clientes</li>
+                    <li><span class="pchk">&#x2713;</span>5 campa&ntilde;as/mes</li>
+                    <li><span class="pchk">&#x2713;</span>Panel b&aacute;sico</li>
+                </ul>
+                <a href="{{ $appUrl }}/register?source=precios-free" class="pbtn pbtn-outline">Empezar gratis</a>
+            </div>
+            <div class="pcard pop">
+                <div class="pop-tag">&#x2B50; M&aacute;s popular</div>
+                <div class="pname">Pro</div>
+                <div class="pprice">29&euro; <small>/mes</small></div>
+                <p class="pdesc">Para crecer sin l&iacute;mites.</p>
+                <ul class="pfeats">
+                    <li><span class="pchk">&#x2713;</span>Clientes ilimitados</li>
+                    <li><span class="pchk">&#x2713;</span>Campa&ntilde;as ilimitadas</li>
+                    <li><span class="pchk">&#x2713;</span>Segmentaci&oacute;n avanzada</li>
+                    <li><span class="pchk">&#x2713;</span>Anal&iacute;tica completa</li>
+                    <li><span class="pchk">&#x2713;</span>Push + email</li>
+                </ul>
+                <a href="{{ $appUrl }}/register?source=precios-pro" class="pbtn pbtn-white">Empezar con Pro</a>
+            </div>
+            <div class="pcard">
+                <div class="pname">Asociaci&oacute;n</div>
+                <div class="pprice">99&euro; <small>/mes</small></div>
+                <p class="pdesc">Para asociaciones y ayuntamientos.</p>
+                <ul class="pfeats">
+                    <li><span class="pchk">&#x2713;</span>Comercios ilimitados</li>
+                    <li><span class="pchk">&#x2713;</span>Panel de asociaci&oacute;n</li>
+                    <li><span class="pchk">&#x2713;</span>Campa&ntilde;as conjuntas</li>
+                    <li><span class="pchk">&#x2713;</span>Reporting B2B2G</li>
+                </ul>
+                <a href="{{ url('/para-asociaciones') }}" class="pbtn pbtn-outline">Contactar</a>
+            </div>
+        </div>
+    </div>
+</section>
+
 {{-- CTA FINAL SPLIT --}}
 <div class="cta-final-split">
     <div class="cta-left">
         <div class="cta-left-inner">
-            <h2>¿Listo para fidelizar a tus clientes?</h2>
-            <p>Regístrate gratis en 2 minutos. Sin tarjeta de crédito. Sin permanencia.</p>
+            <div class="eyebrow" style="color:#c4b5fd;">Empieza hoy</div>
+            <h2>Más clientes.<br>Desde ya.</h2>
+            <p>Regístrate gratis y empieza a captar clientes hoy mismo. Sin contratos, sin letra pequeña. El plan gratuito incluye todo lo que necesitas.</p>
             <div class="cta-btns">
-                <a href="{{ $appUrl }}/qr?source=web-cta-final" class="btn btn-accent">Crear mi QR gratis</a>
+                <a href="{{ $appUrl }}/register?source=web-cta-final" class="btn btn-accent">&#x1F464; Registrarme gratis</a>
                 <a href="{{ url('/como-funciona') }}" class="btn" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);border:1.5px solid rgba(255,255,255,.25);">Cómo funciona</a>
             </div>
         </div>
     </div>
-    <div class="cta-right">
-        <img src="{{ asset('images/big/comerciante-movil-tienda-local-eventify.png') }}"
-             alt="Comerciante gestionando Eventify desde su móvil" loading="lazy">
+    <div class="cta-right" style="background:#fce8f3;">
+        <img src="{{ asset('images/big/ecosistema-ev-comercios-clientes-asociacion-diagrama.png') }}"
+             alt="Diagrama ecosistema Eventify: comercios, clientes y asociación conectados"
+             loading="lazy" style="object-fit:contain;padding:2rem;">
         <div class="cta-right-ov"></div>
     </div>
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+function swTab(btn, id) {
+    document.querySelectorAll('.tab-btn').forEach(function(t) { t.classList.remove('on'); });
+    btn.classList.add('on');
+    document.querySelectorAll('.bene-tab-panel').forEach(function(p) { p.classList.remove('on'); });
+    document.getElementById(id).classList.add('on');
+}
+</script>
+@endpush
