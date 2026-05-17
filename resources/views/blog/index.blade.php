@@ -15,13 +15,13 @@
 <section class="section" style="background:#fff;">
     <div class="container">
 
-        {{-- Filtros de categoría --}}
+        {{-- Filtros de categoría — generados dinámicamente desde la BD --}}
+        @php $categoriasNav = \App\Models\CategoriaBlog::orderBy('nombre')->get(); @endphp
         <div class="blog-filter">
-            <a href="{{ url('/blog') }}" class="bpill {{ !request('cat') ? 'on' : '' }}">Todos</a>
-            <a href="{{ url('/blog?cat=casos-de-exito') }}" class="bpill {{ request('cat') === 'casos-de-exito' ? 'on' : '' }}">Casos de éxito</a>
-            <a href="{{ url('/blog?cat=guias') }}" class="bpill {{ request('cat') === 'guias' ? 'on' : '' }}">Guías prácticas</a>
-            <a href="{{ url('/blog?cat=datos') }}" class="bpill {{ request('cat') === 'datos' ? 'on' : '' }}">Datos y tendencias</a>
-            <a href="{{ url('/blog?cat=asociaciones') }}" class="bpill {{ request('cat') === 'asociaciones' ? 'on' : '' }}">Asociaciones</a>
+            <a href="{{ url('/blog') }}" class="bpill on">Todos</a>
+            @foreach($categoriasNav as $catNav)
+            <a href="{{ url('/blog/categoria/' . $catNav->slug) }}" class="bpill">{{ $catNav->nombre }}</a>
+            @endforeach
         </div>
 
         @if($articulos->count() > 0)
@@ -55,6 +55,7 @@
                             <div class="bf-date">{{ $destacado->fecha_publicacion->format('d M Y') }}</div>
                             @endif
                         </div>
+                        <div class="bf-readtime">&#x23F1; {{ $destacado->tiempoLectura() }} min</div>
                     </div>
                 </div>
             </div>
@@ -81,9 +82,12 @@
                         @endif
                         <div class="blog-card-meta">
                             <span>{{ $articulo->autor ?? 'Equipo Eventify' }}</span>
-                            @if($articulo->fecha_publicacion)
-                            <time datetime="{{ $articulo->fecha_publicacion->toDateString() }}">{{ $articulo->fecha_publicacion->format('d M Y') }}</time>
-                            @endif
+                            <span class="blog-card-meta-right">
+                                @if($articulo->fecha_publicacion)
+                                <time datetime="{{ $articulo->fecha_publicacion->toDateString() }}">{{ $articulo->fecha_publicacion->format('d M') }}</time>
+                                @endif
+                                <span class="blog-readtime">{{ $articulo->tiempoLectura() }} min</span>
+                            </span>
                         </div>
                     </div>
                 </article>
@@ -148,7 +152,10 @@
 .blog-card-title a { color: var(--navy); text-decoration: none; }
 .blog-card-title a:hover { color: var(--brand); }
 .blog-card-excerpt { font-size: 0.875rem; color: var(--muted); margin-bottom: 1rem; }
-.blog-card-meta { display: flex; gap: 1rem; font-size: 0.8rem; color: #9ca3af; }
+.blog-card-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #9ca3af; }
+.blog-card-meta-right { display: flex; gap: 0.5rem; align-items: center; }
+.blog-readtime { background: #f3f4f6; color: #6b7280; padding: 2px 7px; border-radius: 20px; font-size: 0.75rem; white-space: nowrap; }
+.bf-readtime { margin-left: auto; font-size: 0.85rem; color: rgba(255,255,255,.7); white-space: nowrap; }
 @media(max-width:768px){ .blog-grid { grid-template-columns: 1fr; } }
 .blog-newsletter { background: var(--grad-brand); padding: 4rem 2rem; display: flex; flex-wrap: wrap; gap: 2rem; align-items: center; justify-content: center; text-align: left; }
 .bn-copy { color: #fff; max-width: 480px; }

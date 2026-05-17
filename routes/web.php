@@ -7,6 +7,7 @@ use App\Http\Controllers\LocalidadController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SuscriptorController;
 use App\Http\Controllers\Admin\ArticuloController;
+use App\Http\Controllers\Admin\CategoriaBlogController;
 use App\Http\Controllers\Admin\CmsAuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,7 @@ Route::get('/para-asociaciones', [HomeController::class, 'paraAsociaciones']);
 
 // Blog público
 Route::get('/blog', [BlogController::class, 'index']);
+Route::get('/blog/categoria/{slug}', [BlogController::class, 'categoria'])->name('blog.categoria');
 Route::get('/blog/{slug}', [BlogController::class, 'show']);
 
 // Directorio
@@ -47,5 +49,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::middleware('cms.auth')->group(function () {
         Route::resource('articulos', ArticuloController::class);
+        Route::resource('categorias', CategoriaBlogController::class)->except(['show']);
     });
 });

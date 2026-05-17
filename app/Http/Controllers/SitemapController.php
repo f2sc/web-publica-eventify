@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Articulo;
+use App\Models\CategoriaBlog;
 use App\Services\EventifyApiService;
 
 class SitemapController extends Controller
@@ -13,6 +14,7 @@ class SitemapController extends Controller
     {
         $localidades = collect($this->api->localidades()['data'] ?? $this->api->localidades());
         $articulos   = Articulo::publicados()->orderByDesc('fecha_publicacion')->get();
+        $categorias  = CategoriaBlog::orderBy('nombre')->get();
 
         $estaticas = [
             ['url' => url('/'),                 'priority' => '1.0', 'changefreq' => 'weekly'],
@@ -24,7 +26,7 @@ class SitemapController extends Controller
         ];
 
         return response()
-            ->view('sitemap', compact('estaticas', 'localidades', 'articulos'))
+            ->view('sitemap', compact('estaticas', 'localidades', 'articulos', 'categorias'))
             ->header('Content-Type', 'application/xml');
     }
 }

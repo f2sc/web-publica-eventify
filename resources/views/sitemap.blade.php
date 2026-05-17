@@ -21,6 +21,16 @@
     @endif
     @endforeach
 
+    {{-- Categorías del blog --}}
+    @foreach($categorias as $cat)
+    <url>
+        <loc>{{ url('/blog/categoria/' . $cat->slug) }}</loc>
+        <lastmod>{{ $cat->updated_at->toDateString() }}</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    @endforeach
+
     {{-- Artículos del blog --}}
     @foreach($articulos as $articulo)
     <url>

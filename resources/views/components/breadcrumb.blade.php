@@ -5,12 +5,12 @@
     $schema = [
         '@context'        => 'https://schema.org',
         '@type'           => 'BreadcrumbList',
-        'itemListElement' => collect($items)->map(fn($item, $i) => [
+        'itemListElement' => collect($items)->map(fn($item, $i) => array_filter([
             '@type'    => 'ListItem',
             'position' => $i + 1,
             'name'     => $item['label'],
-            'item'     => url($item['url']),
-        ])->values()->all(),
+            'item'     => isset($item['url']) ? url($item['url']) : null,
+        ]))->values()->all(),
     ];
 @endphp
 

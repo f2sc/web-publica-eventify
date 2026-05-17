@@ -19,6 +19,7 @@
             <nav aria-label="Menú admin">
                 <ul class="admin-nav">
                     <li><a href="{{ route('admin.articulos.index') }}" class="{{ request()->is('admin/articulos*') ? 'active' : '' }}">Artículos</a></li>
+                    <li><a href="{{ route('admin.categorias.index') }}" class="{{ request()->is('admin/categorias*') ? 'active' : '' }}">Categorías</a></li>
                 </ul>
             </nav>
             <form action="{{ route('admin.logout') }}" method="POST" class="admin-logout">
