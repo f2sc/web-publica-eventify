@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Panel CMS') | Eventify Admin</title>
     <meta name="robots" content="noindex, nofollow">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
     @stack('head')
@@ -18,8 +19,9 @@
             </a>
             <nav aria-label="Menú admin">
                 <ul class="admin-nav">
-                    <li><a href="{{ route('admin.articulos.index') }}" class="{{ request()->is('admin/articulos*') ? 'active' : '' }}">Artículos</a></li>
+                    <li><a href="{{ route('admin.articulos.index') }}" class="{{ request()->is('admin/articulos*') && !request()->is('admin/articulos/*/ai*') ? 'active' : '' }}">Artículos</a></li>
                     <li><a href="{{ route('admin.categorias.index') }}" class="{{ request()->is('admin/categorias*') ? 'active' : '' }}">Categorías</a></li>
+                    <li><a href="{{ route('admin.ia.config') }}" class="{{ request()->is('admin/ia*') ? 'active' : '' }}">✦ IA</a></li>
                 </ul>
             </nav>
             <form action="{{ route('admin.logout') }}" method="POST" class="admin-logout">

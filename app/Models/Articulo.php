@@ -11,10 +11,12 @@ class Articulo extends Model
     protected $table = 'articulos';
 
     protected $fillable = [
-        'titulo', 'slug', 'extracto', 'contenido', 'imagen_principal',
-        'categoria_blog_id', 'categoria_blog', 'etiquetas', 'meta_title', 'meta_description',
-        'canonical', 'indexable', 'og_image', 'schema_type', 'autor',
-        'estado', 'fecha_publicacion',
+        'titulo', 'slug', 'extracto', 'contenido', 'imagen_principal', 'image_alt',
+        'categoria_blog_id', 'categoria_blog', 'etiquetas', 'focus_keyword',
+        'meta_title', 'meta_description', 'canonical', 'indexable', 'og_image',
+        'schema_type', 'faq_json', 'autor', 'estado', 'fecha_publicacion',
+        'ai_context_summary', 'summary_short', 'ai_generated',
+        'ai_last_provider', 'ai_last_model', 'ai_last_generated_at',
     ];
 
     public function categoriaBlog(): BelongsTo
@@ -23,8 +25,11 @@ class Articulo extends Model
     }
 
     protected $casts = [
-        'indexable'          => 'boolean',
-        'fecha_publicacion'  => 'datetime',
+        'indexable'              => 'boolean',
+        'fecha_publicacion'      => 'datetime',
+        'faq_json'               => 'array',
+        'ai_generated'           => 'boolean',
+        'ai_last_generated_at'   => 'datetime',
     ];
 
     public function scopePublicados(Builder $query): Builder

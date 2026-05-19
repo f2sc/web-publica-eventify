@@ -108,6 +108,22 @@
                 &#9742;
             </a>
         </div>
+
+        {{-- FAQ --}}
+        @if(!empty($articulo->faq_json) && is_array($articulo->faq_json))
+        <section class="art-faq" aria-label="Preguntas frecuentes">
+            <h2>Preguntas frecuentes</h2>
+            @foreach($articulo->faq_json as $faq)
+            @if(!empty($faq['question']))
+            <details class="art-faq-item">
+                <summary class="art-faq-q">{{ $faq['question'] }}</summary>
+                <p class="art-faq-a">{{ $faq['answer'] }}</p>
+            </details>
+            @endif
+            @endforeach
+        </section>
+        @endif
+
     </main>
 
     {{-- Sidebar --}}
@@ -289,6 +305,44 @@
     line-height: 1.85;
     color: #374151;
 }
+/* ── FAQ ──────────────────────────────────────────────────────────────── */
+.art-faq {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e5e7eb;
+}
+.art-faq h2 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--navy);
+    margin-bottom: 1rem;
+}
+.art-faq-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: .5rem;
+    overflow: hidden;
+}
+.art-faq-q {
+    padding: .85rem 1rem;
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: #374151;
+    list-style: none;
+}
+.art-faq-q::-webkit-details-marker { display: none; }
+.art-faq-q::before { content: '+ '; color: var(--brand); font-weight: 700; }
+details[open] .art-faq-q::before { content: '− '; }
+.art-faq-a {
+    padding: .75rem 1rem 1rem;
+    font-size: .9rem;
+    color: #4b5563;
+    line-height: 1.65;
+    margin: 0;
+    background: #f9fafb;
+}
+
 .art-prose h2 {
     font-size: 1.45rem;
     font-weight: 800;

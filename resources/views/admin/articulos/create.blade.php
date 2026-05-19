@@ -8,6 +8,8 @@
     <a href="{{ route('admin.articulos.index') }}" class="btn btn-secondary">← Volver</a>
 </div>
 
+@include('admin.articulos._ai_panel')
+
 <form method="POST" action="{{ route('admin.articulos.store') }}" class="card">
     @csrf
     @include('admin.articulos._form')

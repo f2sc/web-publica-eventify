@@ -72,12 +72,27 @@ class BlogController extends Controller
             'itemListElement' => $breadcrumbItems,
         ];
 
+        $schemas = [$schema, $breadcrumbSchema];
+
+        // FAQPage schema si el artículo tiene FAQ
+        if (!empty($articulo->faq_json) && is_array($articulo->faq_json)) {
+            $schemas[] = [
+                '@context'   => 'https://schema.org',
+                '@type'      => 'FAQPage',
+                'mainEntity' => collect($articulo->faq_json)->map(fn ($f) => [
+                    '@type'          => 'Question',
+                    'name'           => $f['question'] ?? '',
+                    'acceptedAnswer' => ['@type' => 'Answer', 'text' => $f['answer'] ?? ''],
+                ])->all(),
+            ];
+        }
+
         return view('blog.show', [
             'title'            => $articulo->meta_title ?? $articulo->titulo,
             'description'      => $articulo->meta_description ?? $articulo->extracto,
             'canonical'        => $articulo->canonical ?? url("/blog/{$slug}"),
             'indexable'        => $articulo->indexable,
-            'schema'           => [$schema, $breadcrumbSchema],
+            'schema'           => $schemas,
             'ogImage'          => $image,
             'articulo'         => $articulo,
         ]);

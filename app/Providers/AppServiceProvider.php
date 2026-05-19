@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\AI\AiArticleService;
+use App\Services\AI\AiInternalLinker;
 use App\Services\EventifyApiService;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -11,6 +13,8 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton(EventifyApiService::class);
+        $this->app->singleton(AiInternalLinker::class);
+        $this->app->singleton(AiArticleService::class);
     }
 
     /**

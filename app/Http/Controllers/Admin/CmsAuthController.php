@@ -23,7 +23,7 @@ class CmsAuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $response = Http::timeout(5)->post(config('services.eventify.cms_login'), [
+        $response = Http::timeout(15)->acceptJson()->post(config('services.eventify.cms_login'), [
             'email'    => $request->email,
             'password' => $request->password,
         ]);
@@ -37,6 +37,11 @@ class CmsAuthController extends Controller
         }
 
         $data = $response->json();
+
+        if (empty($data['token'])) {
+            return back()->withErrors(['email' => 'Respuesta inesperada del servidor.']);
+        }
+
         session([
             'cms_token' => $data['token'],
             'cms_user'  => $data['user'],

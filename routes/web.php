@@ -7,8 +7,11 @@ use App\Http\Controllers\LocalidadController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SuscriptorController;
 use App\Http\Controllers\Admin\ArticuloController;
+use App\Http\Controllers\Admin\AiGenerateController;
 use App\Http\Controllers\Admin\CategoriaBlogController;
 use App\Http\Controllers\Admin\CmsAuthController;
+use App\Http\Controllers\Admin\IaConfigController;
+use App\Http\Controllers\Admin\IaLogsController;
 use Illuminate\Support\Facades\Route;
 
 // Páginas públicas
@@ -50,5 +53,21 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('cms.auth')->group(function () {
         Route::resource('articulos', ArticuloController::class);
         Route::resource('categorias', CategoriaBlogController::class)->except(['show']);
+
+        // IA — configuración y logs
+        Route::prefix('ia')->name('ia.')->group(function () {
+            Route::get('config',          [IaConfigController::class, 'edit'])->name('config');
+            Route::put('config',          [IaConfigController::class, 'update'])->name('config.update');
+            Route::post('test-connection',[IaConfigController::class, 'testConnection'])->name('test');
+            Route::post('fetch-models',   [IaConfigController::class, 'fetchModels'])->name('fetch-models');
+            Route::get('logs',            [IaLogsController::class, 'index'])->name('logs');
+            Route::post('generate',       [AiGenerateController::class, 'generate'])->name('generate');
+        });
+
+        // IA — operaciones sobre artículo existente
+        Route::prefix('articulos/{articulo}/ai')->name('articulos.ai.')->group(function () {
+            Route::post('regenerate', [AiGenerateController::class, 'regenerateField'])->name('regenerate');
+            Route::post('image',      [AiGenerateController::class, 'generateImage'])->name('image');
+        });
     });
 });
