@@ -26,6 +26,8 @@ class AiGenerateController extends Controller
             'generate_image'  => ['boolean'],
             'generate_faq'    => ['boolean'],
             'suggest_links'   => ['boolean'],
+            'serie_id'        => ['nullable', 'integer', 'exists:series,id'],
+            'orden_en_serie'  => ['nullable', 'integer', 'min:1'],
         ]);
 
         try {

@@ -157,6 +157,8 @@ document.getElementById('ai-generate-btn').addEventListener('click', async () =>
         generate_image: document.getElementById('ai-img').checked,
         generate_faq:   document.getElementById('ai-faq').checked,
         suggest_links:  document.getElementById('ai-links').checked,
+        serie_id:        parseInt(document.getElementById('serie_id')?.value) || null,
+        orden_en_serie:  parseInt(document.getElementById('orden_en_serie')?.value) || null,
     };
 
     try {

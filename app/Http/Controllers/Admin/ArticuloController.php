@@ -19,7 +19,8 @@ class ArticuloController extends Controller
     public function create()
     {
         $categorias = CategoriaBlog::orderBy('nombre')->get();
-        return view('admin.articulos.create', compact('categorias'));
+        $series     = \App\Models\Serie::orderBy('nombre')->get();
+        return view('admin.articulos.create', compact('categorias', 'series'));
     }
 
     public function store(Request $request)
@@ -43,7 +44,8 @@ class ArticuloController extends Controller
     public function edit(Articulo $articulo)
     {
         $categorias = CategoriaBlog::orderBy('nombre')->get();
-        return view('admin.articulos.edit', compact('articulo', 'categorias'));
+        $series     = \App\Models\Serie::orderBy('nombre')->get();
+        return view('admin.articulos.edit', compact('articulo', 'categorias', 'series'));
     }
 
     public function update(Request $request, Articulo $articulo)
@@ -120,10 +122,13 @@ class ArticuloController extends Controller
             'schema_type'         => ['required', 'string', 'in:BlogPosting,Article,HowTo'],
             'faq_json'            => ['nullable', 'string'],
             'autor'               => ['nullable', 'string', 'max:100'],
-            'estado'              => ['required', 'in:borrador,publicado,archivado'],
-            'fecha_publicacion'   => ['nullable', 'date'],
+            'estado'              => ['required', 'in:borrador,programado,publicado,archivado'],
+            'fecha_publicacion'   => ['nullable', 'date_format:Y-m-d\TH:i'],
             'ai_context_summary'  => ['nullable', 'string'],
             'summary_short'       => ['nullable', 'string', 'max:255'],
+            'serie_id'            => ['nullable', 'integer', 'exists:series,id'],
+            'orden_en_serie'      => ['nullable', 'integer', 'min:1'],
+            'enviar_newsletter'   => ['boolean'],
         ]);
     }
 }

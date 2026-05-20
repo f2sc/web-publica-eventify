@@ -12,6 +12,8 @@ use App\Http\Controllers\Admin\CategoriaBlogController;
 use App\Http\Controllers\Admin\CmsAuthController;
 use App\Http\Controllers\Admin\IaConfigController;
 use App\Http\Controllers\Admin\IaLogsController;
+use App\Http\Controllers\Admin\CalendarioController;
+use App\Http\Controllers\Admin\SerieController;
 use Illuminate\Support\Facades\Route;
 
 // Páginas públicas
@@ -23,6 +25,7 @@ Route::get('/para-asociaciones', [HomeController::class, 'paraAsociaciones']);
 // Blog público
 Route::get('/blog', [BlogController::class, 'index']);
 Route::get('/blog/categoria/{slug}', [BlogController::class, 'categoria'])->name('blog.categoria');
+Route::get('/blog/serie/{slug}', [BlogController::class, 'serie'])->name('blog.serie');
 Route::get('/blog/{slug}', [BlogController::class, 'show']);
 
 // Directorio
@@ -68,6 +71,25 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::prefix('articulos/{articulo}/ai')->name('articulos.ai.')->group(function () {
             Route::post('regenerate', [AiGenerateController::class, 'regenerateField'])->name('regenerate');
             Route::post('image',      [AiGenerateController::class, 'generateImage'])->name('image');
+        });
+
+        // Calendario de publicaciones
+        Route::prefix('calendario')->name('calendario.')->group(function () {
+            Route::get('/',                  [CalendarioController::class, 'index'])->name('index');
+            Route::get('/events',            [CalendarioController::class, 'events'])->name('events');
+            Route::post('/programar',        [CalendarioController::class, 'programarSerie'])->name('programar');
+            Route::post('/ia/ideas',         [CalendarioController::class, 'iaIdeas'])->name('ia.ideas');
+            Route::post('/ia/plan',          [CalendarioController::class, 'iaPlan'])->name('ia.plan');
+            Route::post('/tintero/articulo', [CalendarioController::class, 'crearArticuloTintero'])->name('tintero.articulo');
+            Route::post('/tintero/serie',    [CalendarioController::class, 'crearSerieTintero'])->name('tintero.serie');
+        });
+
+        // Series CRUD
+        Route::prefix('series')->name('series.')->group(function () {
+            Route::get('/',           [SerieController::class, 'index'])->name('index');
+            Route::post('/',          [SerieController::class, 'store'])->name('store');
+            Route::put('/{serie}',    [SerieController::class, 'update'])->name('update');
+            Route::delete('/{serie}', [SerieController::class, 'destroy'])->name('destroy');
         });
     });
 });

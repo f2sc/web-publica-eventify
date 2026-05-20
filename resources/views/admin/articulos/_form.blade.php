@@ -198,6 +198,32 @@
     </div>
 </div>
 
+{{-- Serie y orden --}}
+<div class="form-row">
+    <div class="form-group">
+        <label class="form-label" for="serie_id">
+            Serie
+            <span class="tip" tabindex="0" data-tip="Si este artículo pertenece a una serie, selecciónala. Aparecerá la navegación anterior/siguiente en el blog y la IA enlazará con los artículos anteriores de la misma serie.">i</span>
+        </label>
+        <select id="serie_id" name="serie_id" class="form-control" onchange="toggleOrden(this.value)">
+            <option value="">Sin serie (artículo suelto)</option>
+            @foreach($series ?? [] as $serie)
+            <option value="{{ $serie->id }}" {{ old('serie_id', $a?->serie_id) == $serie->id ? 'selected' : '' }}>
+                {{ $serie->nombre }}
+            </option>
+            @endforeach
+        </select>
+    </div>
+    <div class="form-group" id="orden-group" style="{{ old('serie_id', $a?->serie_id) ? '' : 'display:none' }}">
+        <label class="form-label" for="orden_en_serie">
+            Orden en la serie
+            <span class="tip" tabindex="0" data-tip="Posición de este artículo dentro de la serie (1 = primero). Determina la navegación anterior/siguiente en el blog.">i</span>
+        </label>
+        <input type="number" id="orden_en_serie" name="orden_en_serie" class="form-control" min="1"
+               value="{{ old('orden_en_serie', $a?->orden_en_serie) }}" placeholder="1">
+    </div>
+</div>
+
 {{-- Estado y fecha --}}
 <div class="form-row">
     <div class="form-group">
@@ -206,7 +232,7 @@
             <span class="tip" tabindex="0" data-tip="Solo los artículos 'Publicado' con fecha ≤ hoy aparecen en el blog. 'Borrador' los guarda sin publicar. 'Archivado' los oculta sin borrarlos.">i</span>
         </label>
         <select id="estado" name="estado" class="form-control">
-            @foreach(['borrador' => 'Borrador', 'publicado' => 'Publicado', 'archivado' => 'Archivado'] as $val => $label)
+            @foreach(['borrador' => 'Borrador', 'programado' => 'Programado', 'publicado' => 'Publicado', 'archivado' => 'Archivado'] as $val => $label)
             <option value="{{ $val }}" {{ old('estado', $a?->estado ?? 'borrador') === $val ? 'selected' : '' }}>{{ $label }}</option>
             @endforeach
         </select>
@@ -219,6 +245,17 @@
         <input type="datetime-local" id="fecha_publicacion" name="fecha_publicacion" class="form-control"
                value="{{ old('fecha_publicacion', $a?->fecha_publicacion?->format('Y-m-d\TH:i')) }}">
     </div>
+</div>
+
+{{-- Enviar newsletter --}}
+<div class="form-group" style="margin-top:.5rem">
+    <label style="display:flex;align-items:center;gap:.5rem;font-size:.875rem;cursor:pointer">
+        <input type="hidden" name="enviar_newsletter" value="0">
+        <input type="checkbox" name="enviar_newsletter" value="1"
+               {{ old('enviar_newsletter', $a?->enviar_newsletter ?? true) ? 'checked' : '' }}>
+        <span>Enviar newsletter al publicar</span>
+        <span class="tip" tabindex="0" data-tip="Si está marcado, se enviará un email a todos los suscriptores confirmados cuando el artículo se publique (ya sea manualmente o mediante el cron de autopublicación).">i</span>
+    </label>
 </div>
 
 {{-- SEO --}}
@@ -336,6 +373,9 @@ function toggleNuevaCat(val) {
     document.getElementById('nueva-cat-panel').style.display = val === 'nueva' ? 'block' : 'none';
     const nombre = document.getElementById('categoria_nueva_nombre');
     nombre.required = val === 'nueva';
+}
+function toggleOrden(serieId) {
+    document.getElementById('orden-group').style.display = serieId ? 'block' : 'none';
 }
 </script>
 @endpush

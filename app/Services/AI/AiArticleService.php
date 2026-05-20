@@ -17,11 +17,21 @@ class AiArticleService
         $settings = AiSettingsService::get();
         $provider = AiSettingsService::textProvider();
 
-        // 1. Contexto de artículos anteriores
-        $related       = $this->linker->findRelated(
+        // 1. Contexto de artículos anteriores (con forzado de artículos de la serie)
+        $forcedIds = [];
+        if (!empty($input['serie_id']) && !empty($input['orden_en_serie'])) {
+            $forcedIds = Articulo::where('serie_id', $input['serie_id'])
+                ->where('orden_en_serie', '<', (int) $input['orden_en_serie'])
+                ->publicados()
+                ->pluck('id')
+                ->toArray();
+        }
+
+        $related = $this->linker->findRelated(
             $input['focus_keyword'] ?? $input['idea'] ?? '',
             $input['categoria_id'] ?? null,
-            $settings->max_articles_context
+            $settings->max_articles_context,
+            $forcedIds
         );
         $relatedContext = $this->linker->formatForPrompt($related);
 

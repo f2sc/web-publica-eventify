@@ -17,11 +17,17 @@ class Articulo extends Model
         'schema_type', 'faq_json', 'autor', 'estado', 'fecha_publicacion',
         'ai_context_summary', 'summary_short', 'ai_generated',
         'ai_last_provider', 'ai_last_model', 'ai_last_generated_at',
+        'serie_id', 'orden_en_serie', 'enviar_newsletter',
     ];
 
     public function categoriaBlog(): BelongsTo
     {
         return $this->belongsTo(CategoriaBlog::class, 'categoria_blog_id');
+    }
+
+    public function serie(): BelongsTo
+    {
+        return $this->belongsTo(Serie::class, 'serie_id');
     }
 
     protected $casts = [
@@ -30,6 +36,7 @@ class Articulo extends Model
         'faq_json'               => 'array',
         'ai_generated'           => 'boolean',
         'ai_last_generated_at'   => 'datetime',
+        'enviar_newsletter'      => 'boolean',
     ];
 
     public function scopePublicados(Builder $query): Builder

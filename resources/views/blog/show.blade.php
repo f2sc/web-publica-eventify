@@ -75,6 +75,19 @@
 </div>
 
 {{-- ═══ CUERPO DEL ARTÍCULO ════════════════════════════════════════════════ --}}
+{{-- Serie banner --}}
+@if($articulo->serie_id && $articulo->serie)
+@php $totalEnSerie = $articulo->serie->articulos()->publicados()->count(); @endphp
+<div style="background:#f5f3ff;border-bottom:1px solid #ede9fe;padding:.65rem 0">
+  <div class="container" style="font-size:.82rem;color:#7c3aed;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap">
+    <span style="font-weight:700">Serie:</span>
+    <a href="{{ route('blog.serie', $articulo->serie->slug) }}" style="color:#7c3aed;font-weight:700;text-decoration:none">
+      {{ $articulo->serie->nombre }}
+    </a>
+    <span style="color:#a78bfa">— Parte {{ $articulo->orden_en_serie }} de {{ $totalEnSerie }}</span>
+  </div>
+</div>
+@endif
 <div class="art-layout container">
 
     {{-- Contenido principal --}}
@@ -122,6 +135,30 @@
             @endif
             @endforeach
         </section>
+        @endif
+
+        {{-- Anterior / Siguiente en la serie --}}
+        @if(isset($anterior) || isset($siguiente))
+        <nav style="border-top:1px solid #f3f4f6;margin-top:2rem;padding-top:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem" aria-label="Navegación de la serie">
+          <div>
+            @if($anterior)
+            <a href="/blog/{{ $anterior->slug }}"
+               style="display:block;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:.85rem 1rem;text-decoration:none;color:#374151">
+              <span style="font-size:.72rem;font-weight:600;color:#9ca3af;display:block;margin-bottom:.3rem">← Anterior</span>
+              <span style="font-size:.85rem;font-weight:600;color:#1f2937;line-height:1.35;display:block">{{ Str::limit($anterior->titulo, 55) }}</span>
+            </a>
+            @endif
+          </div>
+          <div style="text-align:right">
+            @if($siguiente)
+            <a href="/blog/{{ $siguiente->slug }}"
+               style="display:block;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:.85rem 1rem;text-decoration:none;color:#374151">
+              <span style="font-size:.72rem;font-weight:600;color:#9ca3af;display:block;margin-bottom:.3rem">Siguiente →</span>
+              <span style="font-size:.85rem;font-weight:600;color:#1f2937;line-height:1.35;display:block">{{ Str::limit($siguiente->titulo, 55) }}</span>
+            </a>
+            @endif
+          </div>
+        </nav>
         @endif
 
     </main>

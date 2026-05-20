@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Articulo;
 use App\Models\CategoriaBlog;
+use App\Models\Serie;
 
 class BlogController extends Controller
 {
@@ -32,7 +33,7 @@ class BlogController extends Controller
 
     public function show(string $slug)
     {
-        $articulo = Articulo::with('categoriaBlog')->publicados()->where('slug', $slug)->firstOrFail();
+        $articulo = Articulo::with('categoriaBlog', 'serie')->publicados()->where('slug', $slug)->firstOrFail();
 
         $schemaType = $articulo->schema_type ?? 'BlogPosting';
         $image      = $articulo->og_image ?? $articulo->imagen_principal;
@@ -87,6 +88,23 @@ class BlogController extends Controller
             ];
         }
 
+        // Navegación anterior/siguiente (solo para artículos de una serie)
+        $anterior  = null;
+        $siguiente = null;
+        if ($articulo->serie_id) {
+            $anterior = Articulo::where('serie_id', $articulo->serie_id)
+                ->where('orden_en_serie', '<', $articulo->orden_en_serie)
+                ->publicados()
+                ->orderByDesc('orden_en_serie')
+                ->first();
+
+            $siguiente = Articulo::where('serie_id', $articulo->serie_id)
+                ->where('orden_en_serie', '>', $articulo->orden_en_serie)
+                ->publicados()
+                ->orderBy('orden_en_serie')
+                ->first();
+        }
+
         return view('blog.show', [
             'title'            => $articulo->meta_title ?? $articulo->titulo,
             'description'      => $articulo->meta_description ?? $articulo->extracto,
@@ -95,6 +113,34 @@ class BlogController extends Controller
             'schema'           => $schemas,
             'ogImage'          => $image,
             'articulo'         => $articulo,
+            'anterior'         => $anterior,
+            'siguiente'        => $siguiente,
+        ]);
+    }
+
+    public function serie(string $slug)
+    {
+        $serie = Serie::with(['articulos' => function ($q) {
+            $q->whereIn('estado', ['publicado', 'programado'])->orderBy('orden_en_serie');
+        }, 'categoriaBlog'])->where('slug', $slug)->firstOrFail();
+
+        $schema = [
+            '@context'        => 'https://schema.org',
+            '@type'           => 'ItemList',
+            'name'            => 'Serie: ' . $serie->nombre,
+            'description'     => $serie->descripcion,
+            'numberOfItems'   => $serie->articulos->where('estado', 'publicado')->count(),
+            'itemListElement' => $serie->articulos->where('estado', 'publicado')->values()
+                ->map(fn ($a, $i) => ['@type' => 'ListItem', 'position' => $i + 1, 'url' => url("/blog/{$a->slug}"), 'name' => $a->titulo])
+                ->all(),
+        ];
+
+        return view('blog.serie', [
+            'title'       => 'Serie: ' . $serie->nombre . ' — Blog Eventify',
+            'description' => $serie->descripcion ?? "Serie de artículos: {$serie->nombre}",
+            'canonical'   => url("/blog/serie/{$slug}"),
+            'schema'      => $schema,
+            'serie'       => $serie,
         ]);
     }
 
