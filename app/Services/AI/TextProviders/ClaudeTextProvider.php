@@ -16,19 +16,25 @@ class ClaudeTextProvider implements AiTextProviderInterface
 
     public function generateArticle(string $userPrompt, string $systemPrompt): array
     {
-        $response = $this->call($systemPrompt, $userPrompt, 8192);
+        $response = $this->callWithTool($systemPrompt, $userPrompt);
 
-        $text = $response['content'][0]['text'] ?? '';
         $this->lastUsage = [
             'input_tokens'  => $response['usage']['input_tokens'] ?? 0,
             'output_tokens' => $response['usage']['output_tokens'] ?? 0,
         ];
 
+        foreach ($response['content'] ?? [] as $block) {
+            if (($block['type'] ?? '') === 'tool_use' && ($block['name'] ?? '') === 'create_article') {
+                return $block['input'];
+            }
+        }
+
+        // Fallback: intentar parsear texto libre si tool_use no llegó
+        $text = $response['content'][0]['text'] ?? '';
         $json = $this->extractJson($text);
         if ($json === null) {
             throw new RuntimeException('Claude no devolvió JSON válido: ' . substr($text, 0, 300));
         }
-
         return $json;
     }
 
@@ -67,6 +73,75 @@ class ClaudeTextProvider implements AiTextProviderInterface
         }
 
         return $text;
+    }
+
+    private function callWithTool(string $system, string $user): array
+    {
+        $tool = [
+            'name'         => 'create_article',
+            'description'  => 'Crea un artículo SEO completo con todos sus metadatos',
+            'input_schema' => [
+                'type'       => 'object',
+                'required'   => ['titulo', 'slug', 'contenido', 'extracto', 'meta_title', 'meta_description'],
+                'properties' => [
+                    'titulo'                    => ['type' => 'string'],
+                    'slug'                      => ['type' => 'string'],
+                    'contenido'                 => ['type' => 'string', 'description' => 'Markdown completo del artículo'],
+                    'extracto'                  => ['type' => 'string'],
+                    'focus_keyword'             => ['type' => 'string'],
+                    'etiquetas'                 => ['type' => 'string'],
+                    'schema_type'               => ['type' => 'string'],
+                    'meta_title'                => ['type' => 'string'],
+                    'meta_description'          => ['type' => 'string'],
+                    'image_prompt'              => ['type' => 'string'],
+                    'image_alt'                 => ['type' => 'string'],
+                    'ai_context_summary'        => ['type' => 'string'],
+                    'summary_short'             => ['type' => 'string'],
+                    'faq' => [
+                        'type'  => 'array',
+                        'items' => [
+                            'type'       => 'object',
+                            'properties' => [
+                                'question' => ['type' => 'string'],
+                                'answer'   => ['type' => 'string'],
+                            ],
+                            'required' => ['question', 'answer'],
+                        ],
+                    ],
+                    'internal_links_suggested' => [
+                        'type'  => 'array',
+                        'items' => [
+                            'type'       => 'object',
+                            'properties' => [
+                                'titulo' => ['type' => 'string'],
+                                'slug'   => ['type' => 'string'],
+                                'anchor' => ['type' => 'string'],
+                                'razon'  => ['type' => 'string'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $response = Http::withHeaders([
+            'x-api-key'         => $this->apiKey,
+            'anthropic-version' => '2023-06-01',
+            'content-type'      => 'application/json',
+        ])->timeout(120)->post('https://api.anthropic.com/v1/messages', [
+            'model'       => $this->model,
+            'max_tokens'  => 16000,
+            'system'      => $system,
+            'tools'       => [$tool],
+            'tool_choice' => ['type' => 'tool', 'name' => 'create_article'],
+            'messages'    => [['role' => 'user', 'content' => $user]],
+        ]);
+
+        if ($response->failed()) {
+            throw new RuntimeException('Error Anthropic API: ' . $response->status() . ' — ' . $response->body());
+        }
+
+        return $response->json();
     }
 
     private function call(string $system, string $user, int $maxTokens): array
