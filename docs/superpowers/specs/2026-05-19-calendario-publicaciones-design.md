@@ -324,3 +324,94 @@ resources/views/admin/layouts/admin.blade.php        (nav Calendario)
 resources/views/blog/show.blade.php  (bloque serie + anterior/siguiente)
 routes/web.php                       (rutas nuevas)
 ```
+
+---
+
+## 11. Verificación de la implementación
+
+Lista de comprobaciones manuales y automáticas para confirmar que el módulo funciona correctamente.
+
+### 11.1 Migraciones y modelo
+
+- [ ] `php artisan migrate` ejecuta sin errores.
+- [ ] La tabla `series` existe con las columnas correctas.
+- [ ] `articulos` tiene las columnas `serie_id`, `orden_en_serie`, `enviar_newsletter`.
+- [ ] El enum `estado` de `articulos` acepta el valor `programado`.
+- [ ] `Serie::create(['nombre' => 'Test', 'slug' => 'test'])` persiste correctamente.
+- [ ] `$articulo->serie` devuelve la serie asignada.
+- [ ] `$serie->articulos` devuelve los artículos ordenados por `orden_en_serie`.
+
+### 11.2 Calendario — Admin
+
+- [ ] `GET /admin/calendario` carga sin errores con sesión activa.
+- [ ] `GET /admin/calendario/events?year=2026&month=5` devuelve JSON con los artículos del mes.
+- [ ] El calendario renderiza los eventos en el día correcto según `fecha_publicacion`.
+- [ ] La hora de cada evento es visible en la píldora del calendario.
+- [ ] Los eventos sin contenido muestran animación pulsante roja con ⚠.
+- [ ] La barra de avisos muestra correctamente los artículos sin contenido con fecha próxima (≤ 7 días).
+- [ ] Pinchar un aviso de la barra redirige a `/admin/articulos/{id}/edit`.
+- [ ] El toggle "Artículo único / Serie" cambia el formulario IA correctamente.
+- [ ] El selector de categoría del panel IA lista las categorías reales de la BD.
+- [ ] El tintero muestra artículos sin `fecha_publicacion` agrupados por serie.
+- [ ] Un artículo al que se le asigna fecha desde el editor desaparece del tintero.
+- [ ] El acordeón de series en el tintero colapsa y expande correctamente.
+
+### 11.3 Modal "Programar en calendario"
+
+- [ ] El modal se abre al pulsar "📅 Programar en calendario".
+- [ ] Cambiar la fecha del primer artículo actualiza el preview en tiempo real.
+- [ ] Cambiar la hora actualiza el preview en tiempo real.
+- [ ] Cadencia "Cada X días": 5 artículos con 7 días de separación generan las fechas correctas.
+- [ ] Cadencia "Días de la semana": seleccionar sábado → todas las fechas caen en sábado.
+- [ ] Cadencia "Cada X semanas": 2 semanas → 14 días de separación.
+- [ ] `POST /admin/calendario/programar` actualiza `fecha_publicacion` de todos los artículos de la serie.
+- [ ] Los artículos programados aparecen en el calendario tras confirmar.
+
+### 11.4 Formulario de artículo
+
+- [ ] El campo `fecha_publicacion` muestra `datetime-local` (fecha + hora) en el editor.
+- [ ] Guardar un artículo con datetime-local persiste fecha y hora correctamente en BD.
+- [ ] El select de estado incluye la opción "Programado".
+- [ ] El selector de serie lista todas las series. Al seleccionar una aparece el campo de orden.
+- [ ] El checkbox "Enviar newsletter al publicar" aparece marcado por defecto.
+- [ ] Guardar un artículo con `serie_id` y `orden_en_serie` persiste ambos valores.
+
+### 11.5 Cron de autopublicación
+
+- [ ] `php artisan app:publicar-articulos-programados` ejecuta sin errores.
+- [ ] Un artículo con `estado = programado` y `fecha_publicacion` en el pasado cambia a `publicado` tras ejecutar el comando.
+- [ ] Un artículo con `estado = borrador` y `fecha_publicacion` en el pasado **no** cambia de estado.
+- [ ] Un artículo con `estado = programado` y `fecha_publicacion` en el futuro **no** cambia de estado.
+- [ ] Si `enviar_newsletter = true`, el job `EnviarNewsletterArticulo` se despacha al publicarse.
+- [ ] Si `enviar_newsletter = false`, el job **no** se despacha.
+- [ ] El comando está registrado en `Kernel.php` con `->hourly()`.
+
+### 11.6 Newsletter
+
+- [ ] El Mailable `ArticuloPublicado` se renderiza correctamente (`php artisan tinker` → `new ArticuloPublicado($articulo)`).
+- [ ] El email incluye: título, extracto, imagen principal (si existe) y enlace al artículo.
+- [ ] Solo se envía a suscriptores con `confirmado = true`.
+- [ ] En local/staging: usar `MAIL_MAILER=log` y verificar que el log contiene el email generado.
+
+### 11.7 Blog público — Serie
+
+- [ ] `GET /blog/serie/{slug}` carga correctamente con una serie existente.
+- [ ] La página lista los artículos publicados en orden por `orden_en_serie`.
+- [ ] Los artículos con `estado = programado` y fecha futura aparecen como "Próximamente".
+- [ ] Una serie con `slug` inexistente devuelve 404.
+- [ ] El meta_title y meta_description de la página de serie son correctos en el HTML.
+
+### 11.8 Blog público — Anterior/Siguiente
+
+- [ ] Un artículo sin serie **no** muestra el bloque de navegación.
+- [ ] El artículo 1 de una serie muestra solo "Siguiente →" (sin "← Anterior").
+- [ ] El artículo 5 de 5 muestra solo "← Anterior" (sin "Siguiente →").
+- [ ] Un artículo intermedio muestra ambos enlaces.
+- [ ] Los enlaces de anterior/siguiente apuntan a artículos `publicados` de la misma serie (no a borradores ni programados futuros).
+- [ ] El bloque "Parte X de Y de la serie" enlaza correctamente a `/blog/serie/{slug}`.
+
+### 11.9 IA — Enlazado en series
+
+- [ ] Generar el artículo 3 de una serie (con artículos 1 y 2 publicados) produce un contenido que enlaza a los artículos 1 y 2.
+- [ ] Generar el artículo 1 de una serie (sin artículos previos publicados) no produce enlaces rotos a artículos de la serie.
+- [ ] Generar un artículo suelto (sin `serie_id`) no se ve afectado por la lógica de series.
