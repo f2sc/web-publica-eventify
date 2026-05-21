@@ -17,3 +17,9 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+/.claude
+/.superpowers
+# Capturas de prueba (Playwright y manuales)
+/*.png
+/*.jpg
+/*.jpeg
