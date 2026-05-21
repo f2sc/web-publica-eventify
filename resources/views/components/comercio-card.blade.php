@@ -3,7 +3,8 @@
 @php
     $nombre    = $comercio['nombre_comercial'] ?? $comercio['nombre'] ?? '';
     $categoria = $comercio['categoria']['nombre'] ?? $comercio['tipo_comercio'] ?? '';
-    $slug      = $comercio['slug'] ?? '';
+    $slug          = $comercio['slug'] ?? '';
+    $codigoComer   = $comercio['codigo_comercio'] ?? $slug;
     $logo      = $comercio['url_logo'] ?? null;
     $imgBg     = $comercio['url_img_cabecera'] ?? $comercio['url_img_fachada'] ?? null;
     $ciudad    = $comercio['localidad']['nombre'] ?? (is_string($comercio['localidad'] ?? null) ? $comercio['localidad'] : '');
@@ -33,7 +34,7 @@
             @if($ciudad)<span class="com-dir-city">📍 {{ $ciudad }}</span>@endif
         </div>
         <h3 class="com-dir-name">{{ $nombre }}</h3>
-        <a href="{{ $appUrl }}/comercio/{{ $slug }}" class="com-dir-btn" aria-label="Ver {{ $nombre }} en Eventify">
+        <a href="{{ $appUrl }}/c/{{ $codigoComer }}" class="com-dir-btn" aria-label="Ver {{ $nombre }} en Eventify">
             Ver en Eventify →
         </a>
     </div>

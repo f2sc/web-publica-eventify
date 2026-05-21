@@ -29,7 +29,7 @@ class HomeController extends Controller
         try {
             $respCom  = $this->api->comercios();
             $comercios = collect($respCom['data'] ?? $respCom)
-                ->filter(fn($c) => !empty($c['nombre_comercial']) && !empty($c['localidad']['nombre']))
+                ->filter(fn($c) => !empty($c['nombre_comercial']) && !empty($c['localidad']['nombre']) && ($c['mostrar_en_web'] ?? true) !== false)
                 ->shuffle()
                 ->take(3)
                 ->values()
@@ -86,7 +86,7 @@ class HomeController extends Controller
         try {
             $respCom     = $this->api->comercios();
             $comercioDemo = collect($respCom['data'] ?? $respCom)
-                ->filter(fn($c) => !empty($c['nombre_comercial']) && !empty($c['localidad']['nombre']))
+                ->filter(fn($c) => !empty($c['nombre_comercial']) && !empty($c['localidad']['nombre']) && ($c['mostrar_en_web'] ?? true) !== false)
                 ->shuffle()
                 ->first();
         } catch (\Throwable $e) {
@@ -126,7 +126,7 @@ class HomeController extends Controller
         try {
             $respCom   = $this->api->comercios();
             $comercios = collect($respCom['data'] ?? $respCom)
-                ->filter(fn($c) => !empty($c['nombre_comercial']))
+                ->filter(fn($c) => !empty($c['nombre_comercial']) && ($c['mostrar_en_web'] ?? true) !== false)
                 ->values()->all();
         } catch (\Throwable $e) {
             report($e);

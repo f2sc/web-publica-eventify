@@ -124,7 +124,21 @@
                     $comInits  = strtoupper(mb_substr($comNombre, 0, 2, 'UTF-8'));
                     $comGrads  = ['linear-gradient(135deg,#6d007e,#b12140)','linear-gradient(135deg,#b12140,#6d007e)','linear-gradient(135deg,#9d1060,#b12140)'];
                     $comGrad   = $comGrads[abs(crc32($comNombre)) % count($comGrads)];
+                    $comCodigo = $com['codigo_comercio'] ?? ($com['slug'] ?? null);
                 @endphp
+                @if($comCodigo)
+                <a href="{{ $appUrl }}/c/{{ $comCodigo }}" class="asoc-chip" target="_blank" rel="noopener">
+                    @if(!empty($com['url_logo']))
+                    <div class="asoc-chip-logo" style="background:#f5f5f5;overflow:hidden;padding:0;"><img src="{{ $com['url_logo'] }}" alt="{{ $comNombre }}" style="width:100%;height:100%;object-fit:cover;"></div>
+                    @else
+                    <div class="asoc-chip-logo" style="background:{{ $comGrad }};">{{ $comInits }}</div>
+                    @endif
+                    <div>
+                        <div class="asoc-chip-name">{{ $comNombre }}</div>
+                        @if($comCat)<div class="asoc-chip-type">{{ $comCat }}</div>@endif
+                    </div>
+                </a>
+                @else
                 <div class="asoc-chip">
                     @if(!empty($com['url_logo']))
                     <div class="asoc-chip-logo" style="background:#f5f5f5;overflow:hidden;padding:0;"><img src="{{ $com['url_logo'] }}" alt="{{ $comNombre }}" style="width:100%;height:100%;object-fit:cover;"></div>
@@ -136,6 +150,7 @@
                         @if($comCat)<div class="asoc-chip-type">{{ $comCat }}</div>@endif
                     </div>
                 </div>
+                @endif
                 @endforeach
             </div></div>
             @endif
