@@ -7,6 +7,7 @@ use App\Models\Articulo;
 use App\Services\AI\AiArticleService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Throwable;
 
 class AiGenerateController extends Controller
@@ -32,10 +33,59 @@ class AiGenerateController extends Controller
 
         try {
             $result = $this->service->generate($input);
-            return response()->json(['ok' => true, 'data' => $result]);
+
+            $slug = $this->uniqueSlug(
+                $result['slug'] ?? Str::slug($result['titulo'] ?? 'borrador')
+            );
+
+            $articulo = Articulo::create([
+                'titulo'               => $result['titulo']             ?? 'Borrador sin título',
+                'slug'                 => $slug,
+                'extracto'             => $result['extracto']           ?? null,
+                'contenido'            => $result['contenido']          ?? null,
+                'focus_keyword'        => $result['focus_keyword']      ?? null,
+                'etiquetas'            => $result['etiquetas']          ?? null,
+                'schema_type'          => $result['schema_type']        ?? 'BlogPosting',
+                'meta_title'           => $result['meta_title']         ?? null,
+                'meta_description'     => $result['meta_description']   ?? null,
+                'image_alt'            => $result['image_alt']          ?? null,
+                'ai_context_summary'   => $result['ai_context_summary'] ?? null,
+                'summary_short'        => $result['summary_short']      ?? null,
+                'faq_json'             => $result['faq_json']           ?? null,
+                'imagen_principal'     => $result['imagen_principal']   ?? null,
+                'estado'               => 'borrador',
+                'categoria_blog_id'    => $input['categoria_id']        ?? null,
+                'serie_id'             => $input['serie_id']            ?? null,
+                'orden_en_serie'       => $input['orden_en_serie']      ?? null,
+                'ai_generated'         => true,
+                'ai_last_provider'     => $result['ai_last_provider']   ?? null,
+                'ai_last_model'        => $result['ai_last_model']      ?? null,
+                'ai_last_generated_at' => now(),
+            ]);
+
+            return response()->json([
+                'ok'         => true,
+                'data'       => $result,
+                'article_id' => $articulo->id,
+                'edit_url'   => route('admin.articulos.edit', $articulo),
+            ]);
         } catch (Throwable $e) {
             return response()->json(['ok' => false, 'message' => $e->getMessage()], 500);
         }
+    }
+
+    private function uniqueSlug(string $slug): string
+    {
+        if (empty($slug)) {
+            $slug = 'borrador-' . now()->format('YmdHis');
+        }
+        $base = $slug;
+        $i    = 1;
+        while (Articulo::where('slug', $slug)->exists()) {
+            $slug = "{$base}-{$i}";
+            $i++;
+        }
+        return $slug;
     }
 
     // Regenerar un campo individual en artículo existente
@@ -67,8 +117,8 @@ class AiGenerateController extends Controller
     // Generar solo imagen (artículo existente)
     public function generateImage(Articulo $articulo, Request $request): JsonResponse
     {
-        $data  = $request->validate(['prompt' => ['nullable', 'string', 'max:1000']]);
-        $prompt = $data['prompt'] ?? $articulo->titulo;
+        $data  = $request->validate(['prompt' => ['nullable', 'string', 'max:2000']]);
+        $prompt = !empty($data['prompt']) ? $data['prompt'] : $articulo->titulo;
 
         try {
             $url = $this->service->generateImage($prompt, $articulo->id);

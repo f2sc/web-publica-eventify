@@ -26,7 +26,7 @@ Route::get('/para-asociaciones', [HomeController::class, 'paraAsociaciones']);
 Route::get('/blog', [BlogController::class, 'index']);
 Route::get('/blog/categoria/{slug}', [BlogController::class, 'categoria'])->name('blog.categoria');
 Route::get('/blog/serie/{slug}', [BlogController::class, 'serie'])->name('blog.serie');
-Route::get('/blog/{slug}', [BlogController::class, 'show']);
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 // Directorio
 Route::get('/localidades', [LocalidadController::class, 'index']);
@@ -56,6 +56,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('cms.auth')->group(function () {
         Route::resource('articulos', ArticuloController::class);
         Route::resource('categorias', CategoriaBlogController::class)->except(['show']);
+        Route::post('upload-imagen', [ArticuloController::class, 'uploadImagen'])->name('upload-imagen');
 
         // IA — configuración y logs
         Route::prefix('ia')->name('ia.')->group(function () {
@@ -74,6 +75,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         });
 
         // Calendario de publicaciones
+        Route::patch('articulos/{articulo}/fecha',  [ArticuloController::class, 'updateFecha'])->name('articulos.update-fecha');
+        Route::patch('articulos/{articulo}/estado', [ArticuloController::class, 'updateEstado'])->name('articulos.update-estado');
+        Route::get('articulos/{articulo}/preview',  [ArticuloController::class, 'preview'])->name('articulos.preview');
+
         Route::prefix('calendario')->name('calendario.')->group(function () {
             Route::get('/',                  [CalendarioController::class, 'index'])->name('index');
             Route::get('/events',            [CalendarioController::class, 'events'])->name('events');

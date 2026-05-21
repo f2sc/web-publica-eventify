@@ -19,21 +19,29 @@ class AiSettingsService
 
     public static function textProvider(): AiTextProviderInterface
     {
-        $s = self::get();
+        $s      = self::get();
+        $apiKey = $s->text_api_key ?: match ($s->text_provider ?? 'claude') {
+            'openai' => env('OPENAI_API_KEY', ''),
+            default  => env('ANTHROPIC_API_KEY', ''),
+        };
 
         return match ($s->text_provider) {
-            'openai' => new OpenAiTextProvider($s->text_api_key ?? '', $s->text_model ?: 'gpt-4o-mini'),
-            default  => new ClaudeTextProvider($s->text_api_key ?? '', $s->text_model ?: 'claude-sonnet-4-6'),
+            'openai' => new OpenAiTextProvider($apiKey, $s->text_model ?: 'gpt-4o-mini'),
+            default  => new ClaudeTextProvider($apiKey, $s->text_model ?: 'claude-sonnet-4-6'),
         };
     }
 
     public static function imageProvider(): AiImageProviderInterface
     {
-        $s = self::get();
+        $s      = self::get();
+        $apiKey = $s->image_api_key ?: match ($s->image_provider ?? 'google') {
+            'openai' => env('OPENAI_API_KEY', ''),
+            default  => env('GOOGLE_API_KEY', ''),
+        };
 
         return match ($s->image_provider) {
-            'openai' => new OpenAiImageProvider($s->image_api_key ?? '', $s->image_model ?: 'dall-e-3'),
-            default  => new GoogleImageProvider($s->image_api_key ?? '', $s->image_model ?: 'imagen-4.0-flash-exp'),
+            'openai' => new OpenAiImageProvider($apiKey, $s->image_model ?: 'dall-e-3'),
+            default  => new GoogleImageProvider($apiKey, $s->image_model ?: 'imagen-4.0-flash-exp'),
         };
     }
 

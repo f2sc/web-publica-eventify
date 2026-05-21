@@ -90,7 +90,8 @@
 </div>
 
 {{-- HISTORIAS REALES --}}
-<section class="section" style="background:var(--warm);overflow:hidden;">
+{{-- <section class="section" style="background:var(--warm);overflow:hidden;"> --}}
+@if(false)
     <div class="container">
         <div class="eyebrow">Lo que dicen</div>
         <h2 class="section-title">Así lo están viviendo</h2>
@@ -145,7 +146,8 @@
             @endforeach
         </div>
     </div>
-</section>
+@endif
+{{-- </section> --}}
 
 {{-- ECOSISTEMA --}}
 <div class="eco-sec">
@@ -442,7 +444,7 @@
             <div class="tcard-big">
                 <div class="test-stars">&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</div>
                 <p>"Antes mandaba mensajes de WhatsApp uno a uno. Ahora en 2 minutos lanzo una campaña a 400 clientes y el mismo día viene gente al local."</p>
-                <div class="tauthor">
+                <div class="tauthor" style="display:none">
                     <div class="tavatar">&#x2615;</div>
                     <div>
                         <div class="tname">María González</div>
@@ -453,7 +455,7 @@
             <div class="tcard-big">
                 <div class="test-stars">&#x2605;&#x2605;&#x2605;&#x2605;&#x2605;</div>
                 <p>"Lo del QR parece una tontería pero es lo que más ha sorprendido a mis clientes. 'Qué moderno'. Y ya tengo 280 contactos registrados en Eventify."</p>
-                <div class="tauthor">
+                <div class="tauthor" style="display:none">
                     <div class="tavatar">&#x1F488;</div>
                     <div>
                         <div class="tname">Carlos Ruiz</div>
@@ -463,7 +465,7 @@
             </div>
             <div class="tcard-big big2">
                 <p>"La tasa de apertura del 23% de media. Mi agencia de marketing me cobraba el triple por peores resultados con email marketing."</p>
-                <div class="tauthor">
+                <div class="tauthor" style="display:none">
                     <div class="tavatar">&#x1F33F;</div>
                     <div>
                         <div class="tname">Pedro Sánchez</div>
@@ -483,44 +485,50 @@
             <h2 class="section-title">Empieza gratis. Sin sorpresas.</h2>
             <p class="section-subtitle" style="margin:0 auto;">Sin contratos. Sin comisiones. Cancela cuando quieras.</p>
         </div>
-        <div class="price-grid">
-            <div class="pcard">
-                <div class="pname">Free</div>
-                <div class="pprice">0&euro; <small>/mes</small></div>
-                <p class="pdesc">Para empezar hoy mismo sin coste.</p>
-                <ul class="pfeats">
-                    <li><span class="pchk">&#x2713;</span>1 QR de comercio</li>
-                    <li><span class="pchk">&#x2713;</span>Hasta 500 clientes</li>
-                    <li><span class="pchk">&#x2713;</span>5 campa&ntilde;as/mes</li>
-                    <li><span class="pchk">&#x2713;</span>Panel b&aacute;sico</li>
-                </ul>
-                <a href="{{ $appUrl }}/register?source=precios-free" class="pbtn pbtn-outline">Empezar gratis</a>
+        {{-- PLAN FREE DESTACADO --}}
+        <div class="price-free-wrap">
+            <div class="price-free-card">
+                <div class="pfc-left">
+                    <div class="pfc-badge">&#x2756; Plan incluido</div>
+                    <div class="pfc-name">Gratis</div>
+                    <p class="pfc-desc">Todo lo que necesita un comercio local para captar y fidelizar clientes desde el primer d&iacute;a.</p>
+                    <ul class="pfc-feats">
+                        <li>Clientes ilimitados (1 campa&ntilde;a/d&iacute;a)</li>
+                        <li>Campa&ntilde;as ilimitadas</li>
+                        <li>Segmentaci&oacute;n avanzada</li>
+                        <li>Anal&iacute;tica completa</li>
+                        <li>Push + email</li>
+                    </ul>
+                    <a href="{{ $appUrl }}/register?source=precios-free" class="pfc-btn">Empezar gratis &rarr;</a>
+                </div>
+                <div class="pfc-right">
+                    <div class="pfc-price">0<span>&euro;</span></div>
+                    <div class="pfc-per">al mes, siempre</div>
+                    <div class="pfc-seal">Sin tarjeta.<br>Sin contratos.</div>
+                </div>
             </div>
-            <div class="pcard pop">
-                <div class="pop-tag">&#x2B50; M&aacute;s popular</div>
-                <div class="pname">Pro</div>
-                <div class="pprice">29&euro; <small>/mes</small></div>
-                <p class="pdesc">Para crecer sin l&iacute;mites.</p>
-                <ul class="pfeats">
-                    <li><span class="pchk">&#x2713;</span>Clientes ilimitados</li>
-                    <li><span class="pchk">&#x2713;</span>Campa&ntilde;as ilimitadas</li>
-                    <li><span class="pchk">&#x2713;</span>Segmentaci&oacute;n avanzada</li>
-                    <li><span class="pchk">&#x2713;</span>Anal&iacute;tica completa</li>
-                    <li><span class="pchk">&#x2713;</span>Push + email</li>
-                </ul>
-                <a href="{{ $appUrl }}/register?source=precios-pro" class="pbtn pbtn-white">Empezar con Pro</a>
-            </div>
-            <div class="pcard">
-                <div class="pname">Asociaci&oacute;n</div>
-                <div class="pprice">99&euro; <small>/mes</small></div>
-                <p class="pdesc">Para asociaciones y ayuntamientos.</p>
-                <ul class="pfeats">
-                    <li><span class="pchk">&#x2713;</span>Comercios ilimitados</li>
-                    <li><span class="pchk">&#x2713;</span>Panel de asociaci&oacute;n</li>
-                    <li><span class="pchk">&#x2713;</span>Campa&ntilde;as conjuntas</li>
-                    <li><span class="pchk">&#x2713;</span>Reporting B2B2G</li>
-                </ul>
-                <a href="{{ url('/para-asociaciones') }}" class="pbtn pbtn-outline">Contactar</a>
+        </div>
+
+        {{-- ADD-ONS --}}
+        <div class="price-addons-wrap">
+            <div class="price-addon-sep"><span>&#x2755; &iquest;Necesitas m&aacute;s? Ampl&iacute;a sin cambiar de plan.</span></div>
+            <div class="price-addons-grid">
+                <div class="addon-card">
+                    <div class="addon-top">
+                        <div class="addon-icon">&#x1F4E1;</div>
+                        <div class="addon-name">Mayor alcance</div>
+                    </div>
+                    <p class="addon-desc">Llega a m&aacute;s clientes en cada env&iacute;o. Paga solo cuando lo necesitas, sin suscripci&oacute;n adicional.</p>
+                    <a href="{{ $appUrl }}/register?source=precios-alcance" class="addon-btn">Ver tarifas</a>
+                </div>
+                <div class="addon-card">
+                    <div class="addon-top">
+                        <div class="addon-icon">&#x1F37D;</div>
+                        <div class="addon-name">Carta PRO</div>
+                    </div>
+                    <p class="addon-desc">Carta digital con QR para tu negocio. Men&uacute; actualizable en tiempo real. M&oacute;dulo independiente.</p>
+                    <a href="{{ $appUrl }}/register?source=precios-carta" class="addon-btn">Saber m&aacute;s</a>
+                </div>
             </div>
         </div>
     </div>

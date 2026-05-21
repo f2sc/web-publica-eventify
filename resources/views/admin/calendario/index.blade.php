@@ -70,6 +70,27 @@
 .ia-plan-add { background:#d1fae5; color:#065f46; }
 .ia-plan-prog { background:#6366f1; color:#fff; }
 
+/* ─── Drag & drop ────────────────────────────── */
+.cal-cell { transition: background .12s; min-width: 0; }  /* min-width:0 evita que el grid explote */
+.cal-events { overflow: hidden; min-width: 0; }
+.cal-ev { min-width: 0; max-width: 100%; box-sizing: border-box; }
+.cal-drop-target { background: #eef2ff !important; border-color: #6366f1 !important; outline: 2px dashed #6366f1; }
+.tintero-art[draggable="true"] { cursor: grab; }
+.tintero-art[draggable="true"]:active { cursor: grabbing; }
+.cal-ev[draggable="true"] { cursor: grab; user-select: none; }
+.cal-ev[draggable="true"]:active { cursor: grabbing; }
+.tintero-card.tintero-drop-active { background: #fef9c3 !important; outline: 2px dashed #f59e0b; border-radius: 10px; }
+
+/* ─── Modal hora ──────────────────────────────── */
+.drop-time-bg { position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:1500; display:flex; align-items:center; justify-content:center; }
+.drop-time-box { background:#fff; border-radius:12px; padding:1.25rem; width:260px; box-shadow:0 8px 32px rgba(0,0,0,.18); }
+.drop-time-lbl { font-size:.75rem; color:#6b7280; margin-bottom:.2rem; }
+.drop-time-titulo { font-size:.9rem; font-weight:700; color:#374151; margin-bottom:.85rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.drop-time-actions { display:flex; gap:.5rem; margin-top:.75rem; }
+.drop-time-ok { flex:1; background:#6366f1; color:#fff; border:none; border-radius:7px; padding:.5rem; font-size:.82rem; font-weight:700; cursor:pointer; }
+.drop-time-ok:disabled { opacity:.6; cursor:not-allowed; }
+.drop-time-cancel { padding:.5rem .85rem; background:#fff; border:1px solid #e5e7eb; border-radius:7px; font-size:.82rem; cursor:pointer; }
+
 /* ─── Tintero ─────────────────────────────────── */
 .tintero-card { background:#fff; border:1px solid #e5e7eb; border-radius:10px; padding:.85rem; }
 .tintero-title { font-size:.85rem; font-weight:700; color:#374151; margin-bottom:.5rem; display:flex; justify-content:space-between; align-items:center; }
@@ -196,7 +217,7 @@
         <span>Tintero</span>
         <span style="font-size:.7rem;color:#9ca3af">{{ $sueltos->count() + $series->sum(fn($s)=>$s->articulos->count()) }} pendientes</span>
       </div>
-      <div class="tintero-hint">↔ Artículos sin fecha asignada. Dales fecha desde el editor o con el modal de programación.</div>
+      <div class="tintero-hint">↔ Arrastra un artículo al día del calendario para asignarle fecha.</div>
 
       @foreach($series as $serie)
       <div class="tintero-serie">
@@ -214,7 +235,8 @@
             $badgeClass = $sinContenido && $art->estado==='programado' ? 'badge-prog-warn' : ($art->estado==='programado' ? 'badge-prog' : 'badge-bor');
             $badgeLabel = $art->estado === 'programado' ? 'prog' : 'bor';
           @endphp
-          <div class="tintero-art">
+          <div class="tintero-art" draggable="true" data-art-id="{{ $art->id }}" title="Arrastra al calendario para asignar fecha">
+            <span class="tintero-art-drag" style="cursor:grab;color:#d1d5db;font-size:.7rem;flex-shrink:0">⠿</span>
             <span class="tintero-art-num">{{ $art->orden_en_serie }}.</span>
             <span class="tintero-art-title" title="{{ $art->titulo }}">{{ $art->titulo }}</span>
             <span class="tintero-badge {{ $badgeClass }}">{{ $badgeLabel }}{{ $sinContenido ? ' ⚠' : '' }}</span>
@@ -228,7 +250,8 @@
       @if($sueltos->isNotEmpty())
       <div class="tintero-sueltos-lbl">Sueltos</div>
       @foreach($sueltos as $art)
-      <div class="tintero-art">
+      <div class="tintero-art" draggable="true" data-art-id="{{ $art->id }}" title="Arrastra al calendario para asignar fecha">
+        <span class="tintero-art-drag" style="cursor:grab;color:#d1d5db;font-size:.7rem;flex-shrink:0">⠿</span>
         <span class="tintero-art-num">—</span>
         <span class="tintero-art-title" title="{{ $art->titulo }}">{{ $art->titulo }}</span>
         <span class="tintero-badge badge-bor">bor</span>
@@ -266,7 +289,7 @@
     </div>
 
     {{-- GRID --}}
-    <div class="cal-grid-wrap">
+    <div class="cal-grid-wrap" id="cal-grid-wrap">
       <div class="cal-grid" id="cal-grid"></div>
     </div>
   </div>
@@ -328,7 +351,23 @@
     <a class="cal-pop-btn" id="pop-gen-ia" href="#" style="display:none">✦ Generar contenido con IA</a>
     <button class="cal-pop-btn" id="pop-change-fecha" onclick="popChangeFecha()">📅 Cambiar fecha</button>
     <a class="cal-pop-btn" id="pop-ver-blog" href="#" target="_blank" style="display:none">🔗 Ver en blog</a>
+    <button class="cal-pop-btn danger" onclick="moverATintero()">↩ Mover al tintero</button>
     <button class="cal-pop-btn" onclick="document.getElementById('cal-popover').style.display='none'">✕ Cerrar</button>
+  </div>
+</div>
+
+{{-- MODAL SELECTOR DE HORA (drag & drop) --}}
+<div class="drop-time-bg" id="drop-time-bg" style="display:none" onclick="cancelarDrop()">
+  <div class="drop-time-box" onclick="event.stopPropagation()">
+    <div class="drop-time-lbl" id="drop-time-label">Asignar a …</div>
+    <div class="drop-time-titulo" id="drop-time-titulo"></div>
+    <label style="font-size:.78rem;font-weight:600;color:#374151;display:block;margin-bottom:.3rem">Hora de publicación</label>
+    <input type="time" id="drop-time-input" value="09:00"
+           style="width:100%;border:1px solid #e5e7eb;border-radius:6px;padding:.45rem .6rem;font-size:.95rem;box-sizing:border-box">
+    <div class="drop-time-actions">
+      <button class="drop-time-ok" id="drop-time-ok" onclick="confirmarDrop()">Confirmar</button>
+      <button class="drop-time-cancel" onclick="cancelarDrop()">Cancelar</button>
+    </div>
   </div>
 </div>
 @endsection
@@ -390,14 +429,14 @@ function render(y, m, evs) {
         const ds   = `${y}-${pad(m)}-${pad(day)}`;
         const arts = byDate[ds] || [];
         const today = ds === todayStr ? ' cal-cell--today' : '';
-        html += `<div class="cal-cell${today}"><span class="cal-day-num">${day}</span><div class="cal-events">`;
+        html += `<div class="cal-cell${today}" data-date="${ds}"><span class="cal-day-num">${day}</span><div class="cal-events">`;
         arts.forEach(e => {
             const cls = e.estado==='publicado' ? 'cal-ev--pub'
                       : (e.contenido_vacio && e.estado==='programado') ? 'cal-ev--warn'
                       : e.estado==='programado' ? 'cal-ev--prog' : 'cal-ev--bor';
             const hora = e.fecha_publicacion.split(' ')[1]?.slice(0,5) || '';
             const warn = e.contenido_vacio ? '⚠' : '';
-            html += `<div class="cal-ev ${cls}" onclick="abrirPopover(${e.id}, event)">
+            html += `<div class="cal-ev ${cls}" draggable="true" data-art-id="${e.id}" title="${esc(e.titulo)}" onclick="abrirPopover(${e.id}, event)">
                 <span class="cal-ev-title">${esc(e.titulo)}</span>
                 <span class="cal-ev-time">${hora}${warn}</span>
             </div>`;
@@ -441,6 +480,194 @@ document.addEventListener('click', e => {
 function popChangeFecha() {
     if (!popArtId) return;
     window.location.href = `${ARTURL}/${popArtId}/edit`;
+}
+
+// ── Drag & Drop ──────────────────────────────────
+const FECHA_URL  = '{{ url("/admin/articulos") }}';
+let pendingDrop  = null;   // {artId, dateDs}
+let dragOverCell = null;
+let dragSrcDate  = null;   // fecha de origen cuando drag desde calendario
+
+// — Desde tintero —
+document.querySelector('.tintero-card').addEventListener('dragstart', e => {
+    const art = e.target.closest('[data-art-id]');
+    if (!art) return;
+    dragSrcDate = null;
+    e.dataTransfer.setData('text/plain', art.dataset.artId);
+    e.dataTransfer.effectAllowed = 'move';
+    art.style.opacity = '0.4';
+});
+document.querySelector('.tintero-card').addEventListener('dragend', e => {
+    const art = e.target.closest('[data-art-id]');
+    if (art) art.style.opacity = '';
+});
+
+// — Desde celdas del calendario —
+const gridWrap = document.getElementById('cal-grid-wrap');
+
+gridWrap.addEventListener('dragstart', e => {
+    const ev = e.target.closest('.cal-ev[data-art-id]');
+    if (!ev) return;
+    dragSrcDate = ev.closest('.cal-cell')?.dataset.date || null;
+    e.dataTransfer.setData('text/plain', ev.dataset.artId);
+    e.dataTransfer.effectAllowed = 'move';
+    ev.style.opacity = '0.4';
+});
+gridWrap.addEventListener('dragend', e => {
+    const ev = e.target.closest('.cal-ev');
+    if (ev) ev.style.opacity = '';
+    if (dragOverCell) { dragOverCell.classList.remove('cal-drop-target'); dragOverCell = null; }
+});
+
+// — Dragover / dragleave / drop —
+gridWrap.addEventListener('dragover', e => {
+    const cell = e.target.closest('.cal-cell:not(.cal-cell--empty)');
+    e.preventDefault();
+    if (!cell) return;
+    e.dataTransfer.dropEffect = 'move';
+    if (dragOverCell !== cell) {
+        if (dragOverCell) dragOverCell.classList.remove('cal-drop-target');
+        dragOverCell = cell;
+        cell.classList.add('cal-drop-target');
+    }
+});
+gridWrap.addEventListener('dragleave', e => {
+    if (!gridWrap.contains(e.relatedTarget)) {
+        if (dragOverCell) { dragOverCell.classList.remove('cal-drop-target'); dragOverCell = null; }
+    }
+});
+gridWrap.addEventListener('drop', e => {
+    if (dragOverCell) { dragOverCell.classList.remove('cal-drop-target'); dragOverCell = null; }
+    const cell = e.target.closest('.cal-cell:not(.cal-cell--empty)');
+    if (!cell) return;
+    e.preventDefault();
+
+    const artId  = e.dataTransfer.getData('text/plain');
+    const dateDs = cell.dataset.date;
+    if (!artId || !dateDs) return;
+
+    // Si se suelta en la misma celda de origen, ignorar
+    if (dateDs === dragSrcDate) { dragSrcDate = null; return; }
+
+    const srcDate = dragSrcDate;   // guardar antes de limpiar
+    dragSrcDate = null;
+
+    const key   = `${curYear}-${curMonth}`;
+    const found = evCache[key]?.find(a => a.id == artId);
+
+    // Viene del calendario → conservar la hora ya establecida, sin modal
+    if (srcDate && found) {
+        const hora = found.fecha_publicacion.split(' ')[1]?.slice(0, 5) || '09:00';
+        guardarFecha(artId, dateDs, hora);
+        return;
+    }
+
+    // Viene del tintero → preguntar hora
+    const titulo = found?.titulo || `Artículo #${artId}`;
+    mostrarDropModal(artId, dateDs, titulo);
+});
+
+// — Modal selector de hora —
+function mostrarDropModal(artId, dateDs, titulo) {
+    pendingDrop = { artId, dateDs };
+    const [y, m, d] = dateDs.split('-');
+    const fecha = new Date(+y, +m - 1, +d).toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' });
+    document.getElementById('drop-time-label').textContent  = 'Asignar a ' + fecha;
+    document.getElementById('drop-time-titulo').textContent = titulo;
+    const bg = document.getElementById('drop-time-bg');
+    bg.style.display = 'flex';
+    setTimeout(() => document.getElementById('drop-time-input').focus(), 50);
+}
+
+async function guardarFecha(artId, dateDs, hora) {
+    try {
+        const res = await req(`${FECHA_URL}/${artId}/fecha`, {
+            method: 'PATCH',
+            body: JSON.stringify({ fecha: `${dateDs}T${hora}` }),
+        });
+        if (res.ok) {
+            evCache = {};
+            location.reload();
+        } else {
+            const msg = res.message || (res.errors ? JSON.stringify(res.errors) : 'desconocido');
+            alert('Error al asignar fecha: ' + msg);
+        }
+    } catch (err) {
+        alert('Error de red: ' + err.message);
+    }
+}
+
+async function confirmarDrop() {
+    if (!pendingDrop) return;
+    const { artId, dateDs } = pendingDrop;
+    const hora = document.getElementById('drop-time-input').value || '09:00';
+    const btn  = document.getElementById('drop-time-ok');
+    btn.disabled = true; btn.textContent = 'Guardando…';
+    cancelarDrop();
+    await guardarFecha(artId, dateDs, hora);
+    btn.disabled = false; btn.textContent = 'Confirmar';
+}
+
+function cancelarDrop() {
+    pendingDrop = null;
+    document.getElementById('drop-time-bg').style.display = 'none';
+    const btn = document.getElementById('drop-time-ok');
+    btn.disabled = false; btn.textContent = 'Confirmar';
+}
+
+// Enter / Escape en el campo de hora
+document.getElementById('drop-time-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter')  { e.preventDefault(); confirmarDrop(); }
+    if (e.key === 'Escape') cancelarDrop();
+});
+
+// — Arrastrar cal-ev al tintero para quitarle la fecha —
+const tinteroCard = document.querySelector('.tintero-card');
+
+tinteroCard.addEventListener('dragover', e => {
+    if (!dragSrcDate) return;   // solo acepta drops desde el calendario
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    tinteroCard.classList.add('tintero-drop-active');
+});
+tinteroCard.addEventListener('dragleave', e => {
+    if (!tinteroCard.contains(e.relatedTarget)) {
+        tinteroCard.classList.remove('tintero-drop-active');
+    }
+});
+tinteroCard.addEventListener('drop', async e => {
+    tinteroCard.classList.remove('tintero-drop-active');
+    if (!dragSrcDate) return;   // ignorar si viene del propio tintero
+    e.preventDefault();
+    const artId = e.dataTransfer.getData('text/plain');
+    dragSrcDate = null;
+    if (!artId) return;
+    try {
+        const res = await req(`${ARTURL}/${artId}/fecha`, {
+            method: 'PATCH',
+            body: JSON.stringify({ fecha: null }),
+        });
+        if (res.ok) { evCache = {}; location.reload(); }
+        else alert('Error: ' + (res.message || 'desconocido'));
+    } catch (err) {
+        alert('Error de red: ' + err.message);
+    }
+});
+
+// — Mover al tintero (desde popover) —
+async function moverATintero() {
+    if (!popArtId) return;
+    document.getElementById('cal-popover').style.display = 'none';
+    try {
+        const res = await req(`${ARTURL}/${popArtId}/fecha`, {
+            method: 'PATCH',
+            body: JSON.stringify({ fecha: null }),
+        });
+        if (res.ok) { evCache = {}; location.reload(); }
+        else alert('Error: ' + (res.message || 'desconocido'));
+    } catch (err) {
+        alert('Error de red: ' + err.message);
+    }
 }
 
 // ── Tintero acordeón ─────────────────────────────

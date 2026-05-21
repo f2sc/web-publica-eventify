@@ -34,7 +34,18 @@ class BlogController extends Controller
     public function show(string $slug)
     {
         $articulo = Articulo::with('categoriaBlog', 'serie')->publicados()->where('slug', $slug)->firstOrFail();
+        return $this->renderArticulo($articulo, false);
+    }
 
+    public function showPreview(Articulo $articulo)
+    {
+        $articulo->load('categoriaBlog', 'serie');
+        return $this->renderArticulo($articulo, true);
+    }
+
+    private function renderArticulo(Articulo $articulo, bool $preview): \Illuminate\View\View
+    {
+        $slug       = $articulo->slug;
         $schemaType = $articulo->schema_type ?? 'BlogPosting';
         $image      = $articulo->og_image ?? $articulo->imagen_principal;
 
@@ -51,7 +62,6 @@ class BlogController extends Controller
             'url'           => url("/blog/{$slug}"),
         ];
 
-        // BreadcrumbList — incluye categoría si existe
         $breadcrumbItems = [
             ['@type' => 'ListItem', 'position' => 1, 'name' => 'Blog', 'item' => url('/blog')],
         ];
@@ -67,15 +77,11 @@ class BlogController extends Controller
             $breadcrumbItems[] = ['@type' => 'ListItem', 'position' => 2, 'name' => $articulo->titulo];
         }
 
-        $breadcrumbSchema = [
-            '@context'        => 'https://schema.org',
-            '@type'           => 'BreadcrumbList',
-            'itemListElement' => $breadcrumbItems,
+        $schemas = [
+            $schema,
+            ['@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => $breadcrumbItems],
         ];
 
-        $schemas = [$schema, $breadcrumbSchema];
-
-        // FAQPage schema si el artículo tiene FAQ
         if (!empty($articulo->faq_json) && is_array($articulo->faq_json)) {
             $schemas[] = [
                 '@context'   => 'https://schema.org',
@@ -88,7 +94,6 @@ class BlogController extends Controller
             ];
         }
 
-        // Navegación anterior/siguiente (solo para artículos de una serie)
         $anterior  = null;
         $siguiente = null;
         if ($articulo->serie_id) {
@@ -106,15 +111,16 @@ class BlogController extends Controller
         }
 
         return view('blog.show', [
-            'title'            => $articulo->meta_title ?? $articulo->titulo,
-            'description'      => $articulo->meta_description ?? $articulo->extracto,
-            'canonical'        => $articulo->canonical ?? url("/blog/{$slug}"),
-            'indexable'        => $articulo->indexable,
-            'schema'           => $schemas,
-            'ogImage'          => $image,
-            'articulo'         => $articulo,
-            'anterior'         => $anterior,
-            'siguiente'        => $siguiente,
+            'title'       => $articulo->meta_title ?? $articulo->titulo,
+            'description' => $articulo->meta_description ?? $articulo->extracto,
+            'canonical'   => $articulo->canonical ?? url("/blog/{$slug}"),
+            'indexable'   => $articulo->indexable,
+            'schema'      => $schemas,
+            'ogImage'     => $image,
+            'articulo'    => $articulo,
+            'anterior'    => $anterior,
+            'siguiente'   => $siguiente,
+            'preview'     => $preview,
         ]);
     }
 

@@ -4,11 +4,16 @@
 
 @php
     use League\CommonMark\CommonMarkConverter;
-    $converter = new CommonMarkConverter([
-        'html_input'         => 'strip',
-        'allow_unsafe_links' => false,
-    ]);
-    $contenidoHtml = $converter->convert($articulo->contenido ?? '');
+    $contenido = $articulo->contenido ?? '';
+    if (preg_match('/^\s*</', $contenido)) {
+        $contenidoHtml = $contenido;
+    } else {
+        $converter = new CommonMarkConverter([
+            'html_input'         => 'strip',
+            'allow_unsafe_links' => false,
+        ]);
+        $contenidoHtml = $converter->convert($contenido);
+    }
 
     // Artículos relacionados: misma categoría, excluyendo el actual
     $relacionados = collect();
@@ -30,6 +35,28 @@
 
     $appUrl = config('services.eventify.app_url', env('EVENTIFY_APP_URL', '#'));
 @endphp
+
+@if($preview ?? false)
+@php
+    $estaVivo = $articulo->estado === 'publicado'
+        && (!$articulo->fecha_publicacion || $articulo->fecha_publicacion->lte(now()));
+    if ($articulo->estado === 'publicado' && $articulo->fecha_publicacion?->gt(now())) {
+        $previewMsg = 'Programado para publicarse el ' . $articulo->fecha_publicacion->format('d/m/Y \a \l\a\s H:i') . '. Aún no es accesible públicamente.';
+    } elseif ($articulo->estado === 'borrador') {
+        $previewMsg = 'Este artículo está en borrador y solo es visible para administradores.';
+    } else {
+        $previewMsg = 'Estado: ' . $articulo->estado . '. Solo visible para administradores.';
+    }
+@endphp
+<div style="position:sticky;top:0;z-index:999;background:#fef3c7;border-bottom:2px solid #f59e0b;padding:.6rem 1.25rem;display:flex;align-items:center;gap:.75rem;font-size:.85rem;color:#78350f">
+    <span style="font-size:1.1rem">⚠</span>
+    <div><strong>Vista previa</strong> &nbsp;·&nbsp; {{ $previewMsg }}</div>
+    <a href="{{ route('admin.articulos.edit', $articulo) }}"
+       style="margin-left:auto;white-space:nowrap;background:#f59e0b;color:#fff;padding:.3rem .85rem;border-radius:6px;font-weight:600;text-decoration:none;font-size:.8rem">
+        ← Volver al editor
+    </a>
+</div>
+@endif
 
 {{-- ═══ HERO ═══════════════════════════════════════════════════════════════ --}}
 <div class="art-hero">
@@ -247,10 +274,9 @@
     position: absolute; inset: 0;
     background-size: cover;
     background-position: center 30%;
-    transform: scale(1.04);
-    transition: transform 8s ease;
+    animation: heroZoom 7s ease-out both;
 }
-.art-hero:hover .art-hero-bg { transform: scale(1); }
+@keyframes heroZoom { from { transform: scale(1.08); } to { transform: scale(1); } }
 .art-hero-bg--plain { background: var(--grad-brand); }
 .art-hero-ov {
     position: absolute; inset: 0;

@@ -119,8 +119,14 @@ class AiArticleService
         $settings      = AiSettingsService::get();
         $imageProvider = AiSettingsService::imageProvider();
 
+        // Añadir estilo fotográfico global al prompt del usuario/IA
+        $finalPrompt = trim($prompt, '. ');
+        if (!empty($settings->prompt_image)) {
+            $finalPrompt .= '. ' . $settings->prompt_image;
+        }
+
         try {
-            $url = $imageProvider->generate($prompt, $settings->image_size ?? '1024x1024');
+            $url = $imageProvider->generate($finalPrompt, $settings->image_size ?? '1024x1024');
         } catch (Throwable $e) {
             AiCostLogger::log('image', $imageProvider->providerName(), $imageProvider->modelName(), $articleId, status: 'error', errorMessage: $e->getMessage());
             throw $e;

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Articulo;
 use App\Models\CategoriaBlog;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -67,6 +68,42 @@ class ArticuloController extends Controller
 
         return redirect()->route('admin.articulos.index')
             ->with('success', 'Artículo eliminado.');
+    }
+
+    public function preview(Articulo $articulo)
+    {
+        return app(\App\Http\Controllers\BlogController::class)->showPreview($articulo);
+    }
+
+    public function updateEstado(Articulo $articulo, Request $request): JsonResponse
+    {
+        $request->validate(['estado' => ['required', 'in:borrador,programado,publicado,archivado']]);
+        $articulo->update(['estado' => $request->input('estado')]);
+        return response()->json(['ok' => true]);
+    }
+
+    public function uploadImagen(Request $request): JsonResponse
+    {
+        $request->validate(['image' => ['required', 'image', 'max:5120']]);
+
+        $file = $request->file('image');
+        $dir  = public_path('uploads/blog');
+
+        if (! is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+
+        $name = uniqid('img_', true) . '.' . $file->getClientOriginalExtension();
+        $file->move($dir, $name);
+
+        return response()->json(['ok' => true, 'url' => url('uploads/blog/' . $name)]);
+    }
+
+    public function updateFecha(Articulo $articulo, Request $request): JsonResponse
+    {
+        $request->validate(['fecha' => ['nullable', 'date']]);
+        $articulo->update(['fecha_publicacion' => $request->input('fecha')]);
+        return response()->json(['ok' => true]);
     }
 
     // Si el usuario seleccionó "nueva", crea la categoría y devuelve su ID + nombre
