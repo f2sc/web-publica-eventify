@@ -42,6 +42,7 @@
             <a href="{{ url('/privacidad') }}">Privacidad</a>
             <a href="{{ url('/terminos') }}">Términos</a>
             <a href="{{ url('/cookies') }}">Cookies</a>
+            <a href="{{ route('admin.login') }}">Acceso</a>
         </div>
     </div>
 </footer>
