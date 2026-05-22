@@ -86,28 +86,38 @@ class ArticuloController extends Controller
     {
         $request->validate(['image' => ['required', 'image', 'max:5120']]);
 
-        $file     = $request->file('image');
-        $ext      = strtolower($file->getClientOriginalExtension()) ?: 'jpg';
-        $baseName = $this->buildUploadBaseName($request);
-        $relPath  = 'articulos/' . $baseName . '.' . $ext;
+        try {
+            $file     = $request->file('image');
+            $ext      = strtolower($file->getClientOriginalExtension()) ?: 'jpg';
+            $baseName = $this->buildUploadBaseName($request);
+            $relPath  = 'articulos/' . $baseName . '.' . $ext;
 
-        // Evitar sobreescribir si ya existe otro fichero con ese nombre
-        $i = 1;
-        while (\Illuminate\Support\Facades\Storage::disk('public')->exists($relPath)) {
-            $relPath = 'articulos/' . $baseName . '-' . $i . '.' . $ext;
-            $i++;
+            // Evitar sobreescribir si ya existe otro fichero con ese nombre
+            $i = 1;
+            while (\Illuminate\Support\Facades\Storage::disk('public')->exists($relPath)) {
+                $relPath = 'articulos/' . $baseName . '-' . $i . '.' . $ext;
+                $i++;
+            }
+
+            $bytes = file_get_contents($file->getRealPath());
+            if ($bytes === false || strlen($bytes) < 10) {
+                return response()->json(['ok' => false, 'message' => 'No se pudo leer el fichero subido.']);
+            }
+
+            $saved = \Illuminate\Support\Facades\Storage::disk('public')->put($relPath, $bytes);
+            if (!$saved) {
+                \Illuminate\Support\Facades\Log::error('uploadImagen: Storage::put falló', ['path' => $relPath]);
+                return response()->json(['ok' => false, 'message' => 'No se pudo guardar la imagen. Revisa los permisos del directorio storage/app/public/articulos/']);
+            }
+
+            return response()->json([
+                'ok'  => true,
+                'url' => \Illuminate\Support\Facades\Storage::disk('public')->url($relPath),
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('uploadImagen error: ' . $e->getMessage());
+            return response()->json(['ok' => false, 'message' => 'Error al subir imagen: ' . $e->getMessage()]);
         }
-
-        \Illuminate\Support\Facades\Storage::disk('public')->putFileAs(
-            'articulos',
-            $file,
-            basename($relPath)
-        );
-
-        return response()->json([
-            'ok'  => true,
-            'url' => \Illuminate\Support\Facades\Storage::disk('public')->url($relPath),
-        ]);
     }
 
     private function buildUploadBaseName(Request $request): string
