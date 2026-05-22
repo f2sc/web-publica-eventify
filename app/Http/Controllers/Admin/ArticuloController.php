@@ -86,27 +86,28 @@ class ArticuloController extends Controller
     {
         $request->validate(['image' => ['required', 'image', 'max:5120']]);
 
-        $file = $request->file('image');
-        $dir  = public_path('uploads/blog');
-
-        if (! is_dir($dir)) {
-            mkdir($dir, 0775, true);
-        }
-
+        $file     = $request->file('image');
         $ext      = strtolower($file->getClientOriginalExtension()) ?: 'jpg';
         $baseName = $this->buildUploadBaseName($request);
-        $name     = $baseName . '.' . $ext;
+        $relPath  = 'articulos/' . $baseName . '.' . $ext;
 
         // Evitar sobreescribir si ya existe otro fichero con ese nombre
         $i = 1;
-        while (file_exists($dir . '/' . $name)) {
-            $name = $baseName . '-' . $i . '.' . $ext;
+        while (\Illuminate\Support\Facades\Storage::disk('public')->exists($relPath)) {
+            $relPath = 'articulos/' . $baseName . '-' . $i . '.' . $ext;
             $i++;
         }
 
-        $file->move($dir, $name);
+        \Illuminate\Support\Facades\Storage::disk('public')->putFileAs(
+            'articulos',
+            $file,
+            basename($relPath)
+        );
 
-        return response()->json(['ok' => true, 'url' => url('uploads/blog/' . $name)]);
+        return response()->json([
+            'ok'  => true,
+            'url' => \Illuminate\Support\Facades\Storage::disk('public')->url($relPath),
+        ]);
     }
 
     private function buildUploadBaseName(Request $request): string
