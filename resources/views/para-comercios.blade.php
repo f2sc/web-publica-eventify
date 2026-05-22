@@ -67,15 +67,20 @@
         <div class="com-slider-track" id="comTrack">
             @foreach($comercios as $c)
             @php
-                $cNombre = $c['nombre_comercial'] ?? '';
-                $cCat    = $c['categoria']['nombre'] ?? '';
-                $cLoc    = $c['localidad']['nombre'] ?? '';
-                $cLogo   = $c['url_logo'] ?? null;
-                $cInits  = strtoupper(mb_substr($cNombre, 0, 2, 'UTF-8'));
-                $cGrads  = ['linear-gradient(135deg,#6d007e,#b12140)','linear-gradient(135deg,#b12140,#6d007e)','linear-gradient(135deg,#9d1060,#b12140)','linear-gradient(135deg,#6d007e,#9d1060)'];
-                $cGrad   = $cGrads[abs(crc32($cNombre)) % count($cGrads)];
+                $cNombre  = $c['nombre_comercial'] ?? '';
+                $cCat     = $c['categoria']['nombre'] ?? '';
+                $cLoc     = $c['localidad']['nombre'] ?? '';
+                $cLogo    = $c['url_logo'] ?? null;
+                $cCodigo  = $c['codigo_comercio'] ?? ($c['slug'] ?? null);
+                $cInits   = strtoupper(mb_substr($cNombre, 0, 2, 'UTF-8'));
+                $cGrads   = ['linear-gradient(135deg,#6d007e,#b12140)','linear-gradient(135deg,#b12140,#6d007e)','linear-gradient(135deg,#9d1060,#b12140)','linear-gradient(135deg,#6d007e,#9d1060)'];
+                $cGrad    = $cGrads[abs(crc32($cNombre)) % count($cGrads)];
             @endphp
+            @if($cCodigo)
+            <a href="{{ $appUrl }}/c/{{ $cCodigo }}" class="com-card" target="_blank" rel="noopener">
+            @else
             <div class="com-card">
+            @endif
                 @if($cLogo)
                 <div class="com-card-logo" style="background:#f5f5f5;padding:0;overflow:hidden;"><img src="{{ $cLogo }}" alt="{{ $cNombre }}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;"></div>
                 @else
@@ -86,7 +91,11 @@
                     @if($cCat)<div class="com-card-type">{{ $cCat }}</div>@endif
                     @if($cLoc)<div class="com-card-loc">{{ $cLoc }}</div>@endif
                 </div>
+            @if($cCodigo)
+            </a>
+            @else
             </div>
+            @endif
             @endforeach
         </div>
     </div>

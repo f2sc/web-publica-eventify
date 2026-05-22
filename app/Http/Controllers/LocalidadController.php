@@ -38,7 +38,9 @@ class LocalidadController extends Controller
     {
         $response  = $this->api->localidad($slug);
         $localidad = $response['data'] ?? $response;
-        $comercios = $localidad['comercios'] ?? [];
+        $comercios = collect($localidad['comercios'] ?? [])
+            ->filter(fn($c) => (bool)($c['mostrar_en_web'] ?? true))
+            ->values()->all();
         $nombre    = $localidad['nombre'] ?? $localidad['name'] ?? ucfirst($slug);
 
         $breadcrumb = [
@@ -85,7 +87,9 @@ class LocalidadController extends Controller
         $nombreLoc   = $localidad['nombre'] ?? $localidad['name'] ?? ucfirst($loc);
 
         $responseComercio = $this->api->comercios(['localidad' => $loc, 'categoria' => $cat]);
-        $lista            = $responseComercio['data'] ?? $responseComercio;
+        $lista            = collect($responseComercio['data'] ?? $responseComercio)
+            ->filter(fn($c) => (bool)($c['mostrar_en_web'] ?? true))
+            ->values()->all();
 
         $categorias = $this->api->categorias();
         $categoria  = collect($categorias['data'] ?? $categorias)->firstWhere('slug', $cat);

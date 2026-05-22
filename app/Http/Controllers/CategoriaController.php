@@ -11,7 +11,9 @@ class CategoriaController extends Controller
     public function show(string $slug)
     {
         $comercios = $this->api->comercios(['categoria' => $slug]);
-        $lista     = $comercios['data'] ?? $comercios;
+        $lista     = collect($comercios['data'] ?? $comercios)
+            ->filter(fn($c) => (bool)($c['mostrar_en_web'] ?? true))
+            ->values()->all();
 
         $categorias = $this->api->categorias();
         $categoria  = collect($categorias['data'] ?? $categorias)->firstWhere('slug', $slug);

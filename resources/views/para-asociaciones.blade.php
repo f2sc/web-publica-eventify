@@ -158,6 +158,15 @@
         @endforeach
     </div>
 </section>
+@else
+<section class="asoc-dir-sec">
+    <div class="asoc-dir-header" style="text-align:center;">
+        <div class="eyebrow" style="justify-content:center;">&#x1F3DB; Asociaciones</div>
+        <h2 class="section-title">&iquest;Gestionas una asociaci&oacute;n de comerciantes?</h2>
+        <p class="section-subtitle" style="margin:0 auto 2rem;">Digitaliza el comercio de tu barrio o municipio. Gestiona todos tus miembros, lanza campa&ntilde;as conjuntas y demuestra tu impacto.</p>
+        <a href="{{ $appUrl }}/register?source=para-asociaciones-empty" class="btn btn-primary">Registrar mi asociaci&oacute;n &rarr;</a>
+    </div>
+</section>
 @endif
 
 <div class="cta-final-split">

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Articulo;
 use App\Services\EventifyApiService;
 
 class HomeController extends Controller
@@ -29,7 +30,7 @@ class HomeController extends Controller
         try {
             $respCom  = $this->api->comercios();
             $comercios = collect($respCom['data'] ?? $respCom)
-                ->filter(fn($c) => !empty($c['nombre_comercial']) && !empty($c['localidad']['nombre']) && ($c['mostrar_en_web'] ?? true) !== false)
+                ->filter(fn($c) => !empty($c['nombre_comercial']) && !empty($c['localidad']['nombre']) && (bool)($c['mostrar_en_web'] ?? true))
                 ->shuffle()
                 ->take(3)
                 ->values()
@@ -46,6 +47,12 @@ class HomeController extends Controller
             report($e);
             $stats = [];
         }
+
+        $articulos = Articulo::publicados()
+            ->with('categoriaBlog')
+            ->orderByDesc('fecha_publicacion')
+            ->take(4)
+            ->get();
 
         $schema = [
             '@context' => 'https://schema.org',
@@ -78,6 +85,7 @@ class HomeController extends Controller
             'asociaciones' => $asociaciones,
             'comercios'    => $comercios,
             'stats'        => $stats,
+            'articulos'    => $articulos,
         ]);
     }
 
@@ -86,7 +94,7 @@ class HomeController extends Controller
         try {
             $respCom     = $this->api->comercios();
             $comercioDemo = collect($respCom['data'] ?? $respCom)
-                ->filter(fn($c) => !empty($c['nombre_comercial']) && !empty($c['localidad']['nombre']) && ($c['mostrar_en_web'] ?? true) !== false)
+                ->filter(fn($c) => !empty($c['nombre_comercial']) && !empty($c['localidad']['nombre']) && (bool)($c['mostrar_en_web'] ?? true))
                 ->shuffle()
                 ->first();
         } catch (\Throwable $e) {
@@ -126,7 +134,7 @@ class HomeController extends Controller
         try {
             $respCom   = $this->api->comercios();
             $comercios = collect($respCom['data'] ?? $respCom)
-                ->filter(fn($c) => !empty($c['nombre_comercial']) && ($c['mostrar_en_web'] ?? true) !== false)
+                ->filter(fn($c) => !empty($c['nombre_comercial']) && (bool)($c['mostrar_en_web'] ?? true))
                 ->values()->all();
         } catch (\Throwable $e) {
             report($e);
@@ -150,11 +158,16 @@ class HomeController extends Controller
             $asociaciones = collect($slugs)->map(function ($slug) {
                 try {
                     $detail = $this->api->asociacion($slug);
-                    return $detail['data'] ?? $detail;
+                    $asoc   = $detail['data'] ?? $detail;
+                    $asoc['comercios'] = collect($asoc['comercios'] ?? [])
+                        ->filter(fn($c) => (bool)($c['mostrar_en_web'] ?? true))
+                        ->values()->all();
+                    return $asoc;
                 } catch (\Throwable $e) {
                     return null;
                 }
-            })->filter()->values()->all();
+            })->filter(fn($a) => $a !== null && count($a['comercios'] ?? []) > 0)
+              ->values()->all();
         } catch (\Throwable $e) {
             report($e);
             $asociaciones = [];

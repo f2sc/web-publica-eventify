@@ -534,6 +534,84 @@
     </div>
 </section>
 
+{{-- BLOG --}}
+@if($articulos->count() > 0)
+@php
+    $artDestacado = $articulos->first();
+    $artResto     = $articulos->skip(1)->take(3);
+@endphp
+<section class="blog-home-sec">
+    <div class="container">
+        <div class="blog-home-header">
+            <div>
+                <div class="eyebrow">&#x1F4D6; Blog</div>
+                <h2 class="section-title">Ideas para crecer.<br>Historias que inspiran.</h2>
+                <p class="section-subtitle" style="margin:0;max-width:520px;">Guías, casos de éxito y tendencias para el comercio local que quiere dar el salto digital.</p>
+            </div>
+            <a href="{{ url('/blog') }}" class="btn btn-secondary blog-home-ver-btn">Ver todos los artículos &rarr;</a>
+        </div>
+
+        {{-- Artículo destacado --}}
+        <a href="{{ url('/blog/' . $artDestacado->slug) }}" class="blog-feat-card">
+            <div class="blog-feat-img">
+                @if($artDestacado->imagen_principal)
+                <img src="{{ $artDestacado->imagen_principal }}" alt="{{ $artDestacado->image_alt ?? $artDestacado->titulo }}" loading="lazy">
+                @else
+                <div class="blog-feat-img-placeholder"></div>
+                @endif
+                <div class="blog-feat-img-ov"></div>
+            </div>
+            <div class="blog-feat-body">
+                @if($artDestacado->categoriaBlog)
+                <div class="blog-cat-badge">{{ strtoupper($artDestacado->categoriaBlog->nombre) }}</div>
+                @endif
+                <h3 class="blog-feat-title">{{ $artDestacado->titulo }}</h3>
+                @if($artDestacado->extracto)
+                <p class="blog-feat-excerpt">{{ $artDestacado->extracto }}</p>
+                @endif
+                <div class="blog-meta">
+                    <div class="blog-avatar">&#x1F9F8;</div>
+                    <div>
+                        <div class="blog-author">{{ $artDestacado->autor ?? 'Equipo Eventify' }}</div>
+                        <div class="blog-date">{{ optional($artDestacado->fecha_publicacion)->isoFormat('D MMM YYYY') }}</div>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+        {{-- 3 artículos pequeños --}}
+        @if($artResto->count() > 0)
+        <div class="blog-grid">
+            @foreach($artResto as $art)
+            <a href="{{ url('/blog/' . $art->slug) }}" class="blog-card">
+                <div class="blog-card-img">
+                    @if($art->imagen_principal)
+                    <img src="{{ $art->imagen_principal }}" alt="{{ $art->image_alt ?? $art->titulo }}" loading="lazy">
+                    @else
+                    <div class="blog-card-img-placeholder"></div>
+                    @endif
+                </div>
+                <div class="blog-card-body">
+                    @if($art->categoriaBlog)
+                    <div class="blog-cat-badge">{{ strtoupper($art->categoriaBlog->nombre) }}</div>
+                    @endif
+                    <h3 class="blog-card-title">{{ $art->titulo }}</h3>
+                    @if($art->extracto)
+                    <p class="blog-card-excerpt">{{ Str::limit($art->extracto, 100) }}</p>
+                    @endif
+                    <div class="blog-meta blog-meta-sm">
+                        <span class="blog-author">{{ $art->autor ?? 'Equipo Eventify' }}</span>
+                        <span class="blog-read-time">{{ $art->tiempoLectura() }} min</span>
+                    </div>
+                </div>
+            </a>
+            @endforeach
+        </div>
+        @endif
+    </div>
+</section>
+@endif
+
 {{-- CTA FINAL SPLIT --}}
 <div class="cta-final-split">
     <div class="cta-left">
