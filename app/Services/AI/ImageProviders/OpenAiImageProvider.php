@@ -16,7 +16,7 @@ class OpenAiImageProvider implements AiImageProviderInterface
         private readonly string $model = 'dall-e-3'
     ) {}
 
-    public function generate(string $prompt, string $size = '1024x1024'): string
+    public function generate(string $prompt, string $size = '1024x1024', string $baseName = ''): string
     {
         $payload = [
             'model'  => $this->model,
@@ -49,7 +49,7 @@ class OpenAiImageProvider implements AiImageProviderInterface
             throw new RuntimeException('OpenAI Images error ' . $response->status() . ': ' . $msg);
         }
 
-        $filename = 'articulos/' . Str::uuid() . '.jpg';
+        $filename = 'articulos/' . self::buildFilename($baseName) . '.jpg';
 
         // gpt-image-2 devuelve b64_json; DALL-E 3 devuelve url
         $b64 = $response->json('data.0.b64_json') ?? null;
@@ -99,5 +99,18 @@ class OpenAiImageProvider implements AiImageProviderInterface
     public function modelName(): string
     {
         return $this->model;
+    }
+
+    public static function buildFilename(string $baseName): string
+    {
+        if ($baseName !== '') {
+            // Sanitizar: slug limpio, máximo 80 chars
+            $slug = \Illuminate\Support\Str::slug($baseName);
+            $slug = substr($slug, 0, 80);
+            if ($slug !== '') {
+                return $slug;
+            }
+        }
+        return (string) \Illuminate\Support\Str::uuid();
     }
 }

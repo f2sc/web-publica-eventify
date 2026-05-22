@@ -93,10 +93,50 @@ class ArticuloController extends Controller
             mkdir($dir, 0775, true);
         }
 
-        $name = uniqid('img_', true) . '.' . $file->getClientOriginalExtension();
+        $ext      = strtolower($file->getClientOriginalExtension()) ?: 'jpg';
+        $baseName = $this->buildUploadBaseName($request);
+        $name     = $baseName . '.' . $ext;
+
+        // Evitar sobreescribir si ya existe otro fichero con ese nombre
+        $i = 1;
+        while (file_exists($dir . '/' . $name)) {
+            $name = $baseName . '-' . $i . '.' . $ext;
+            $i++;
+        }
+
         $file->move($dir, $name);
 
         return response()->json(['ok' => true, 'url' => url('uploads/blog/' . $name)]);
+    }
+
+    private function buildUploadBaseName(Request $request): string
+    {
+        // Intentar con article_id → slug del artículo guardado
+        if ($request->filled('article_id')) {
+            $articulo = Articulo::find((int) $request->input('article_id'));
+            if ($articulo) {
+                $base = $articulo->focus_keyword ?: $articulo->slug ?: $articulo->titulo ?: '';
+                $slug = \Illuminate\Support\Str::slug($base);
+                $slug = substr($slug, 0, 70);
+                if ($slug) {
+                    return $slug . '-imagen-principal';
+                }
+            }
+        }
+
+        // Fallback: slug enviado desde el formulario (artículo nuevo, aún no guardado)
+        if ($request->filled('article_slug')) {
+            $slug = \Illuminate\Support\Str::slug($request->input('article_slug'));
+            $slug = substr($slug, 0, 70);
+            if ($slug) {
+                return $slug . '-imagen-principal';
+            }
+        }
+
+        // Último recurso: nombre original del fichero sanitizado
+        $original = pathinfo($request->file('image')->getClientOriginalName(), PATHINFO_FILENAME);
+        $slug     = \Illuminate\Support\Str::slug($original);
+        return $slug ?: ('imagen-blog-' . now()->format('YmdHis'));
     }
 
     public function updateFecha(Articulo $articulo, Request $request): JsonResponse

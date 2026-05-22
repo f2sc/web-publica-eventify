@@ -4,7 +4,7 @@ namespace App\Services\AI\ImageProviders;
 
 interface AiImageProviderInterface
 {
-    public function generate(string $prompt, string $size): string;
+    public function generate(string $prompt, string $size, string $baseName = ''): string;
 
     public function lastCost(): float;
 

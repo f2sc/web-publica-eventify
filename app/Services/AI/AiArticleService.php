@@ -125,8 +125,11 @@ class AiArticleService
             $finalPrompt .= '. ' . $settings->prompt_image;
         }
 
+        // Nombre SEO para el fichero basado en el artículo
+        $baseName = $this->buildImageBaseName($articleId);
+
         try {
-            $url = $imageProvider->generate($finalPrompt, $settings->image_size ?? '1024x1024');
+            $url = $imageProvider->generate($finalPrompt, $settings->image_size ?? '1024x1024', $baseName);
         } catch (Throwable $e) {
             AiCostLogger::log('image', $imageProvider->providerName(), $imageProvider->modelName(), $articleId, status: 'error', errorMessage: $e->getMessage());
             throw $e;
@@ -135,6 +138,28 @@ class AiArticleService
         AiCostLogger::log('image', $imageProvider->providerName(), $imageProvider->modelName(), $articleId, fixedCost: $imageProvider->lastCost());
 
         return $url;
+    }
+
+    private function buildImageBaseName(?int $articleId): string
+    {
+        if (!$articleId) {
+            return '';
+        }
+        $articulo = Articulo::find($articleId);
+        if (!$articulo) {
+            return '';
+        }
+
+        // Prioridad: keyword > slug > título
+        $base = $articulo->focus_keyword
+             ?: $articulo->slug
+             ?: $articulo->titulo
+             ?: '';
+
+        $base = Str::slug($base);
+        $base = substr($base, 0, 70);
+
+        return $base ? $base . '-imagen-principal' : '';
     }
 
     private function buildUserPrompt(array $input, string $relatedContext, $settings): string

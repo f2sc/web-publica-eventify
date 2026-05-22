@@ -640,6 +640,9 @@ async function subirImagen(input) {
     const fd = new FormData();
     fd.append('image', input.files[0]);
     fd.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+    if (typeof AI_ARTICLE_ID !== 'undefined' && AI_ARTICLE_ID) fd.append('article_id', AI_ARTICLE_ID);
+    const slugField = document.querySelector('[name="slug"]');
+    if (slugField?.value) fd.append('article_slug', slugField.value);
 
     try {
         const r   = await fetch(UPLOAD_URL, { method: 'POST', body: fd });
