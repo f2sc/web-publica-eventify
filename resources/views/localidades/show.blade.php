@@ -6,7 +6,6 @@
     <div class="sub-hero-bg" style="background:var(--grad-brand);"></div>
     <div class="sub-hero-ov"></div>
     <div class="sub-hero-cnt">
-        <x-breadcrumb :items="$breadcrumb" />
         <div class="sub-ey">Directorio local</div>
         <h1>Comercios en {{ $nombre }}</h1>
         <p>Descubre los comercios con programa de fidelización QR, ofertas y notificaciones push en {{ $nombre }}.</p>

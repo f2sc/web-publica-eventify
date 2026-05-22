@@ -68,12 +68,6 @@
     @endif
 
     <div class="art-hero-inner container">
-        <x-breadcrumb :items="array_values(array_filter([
-            ['label' => 'Blog', 'url' => '/blog'],
-            $articulo->categoriaBlog ? ['label' => $articulo->categoriaBlog->nombre, 'url' => '/blog/categoria/' . $articulo->categoriaBlog->slug] : null,
-            ['label' => $articulo->titulo],
-        ]))" />
-
         <div class="art-hero-meta-top">
             @if($articulo->categoria_blog)
             <span class="art-cat-pill">{{ $articulo->categoria_blog }}</span>
@@ -287,12 +281,6 @@
     padding-top: 6rem;
 }
 
-/* Breadcrumb sobre el hero: texto claro */
-.art-hero-inner .breadcrumb-nav { --bc-color: rgba(255,255,255,.65); }
-.art-hero-inner .breadcrumb-nav a { color: rgba(255,255,255,.8); }
-.art-hero-inner .breadcrumb-nav a:hover { color: #fff; }
-.art-hero-inner .breadcrumb-sep { color: rgba(255,255,255,.4); }
-.art-hero-inner [aria-current=page] { color: rgba(255,255,255,.6); }
 
 .art-hero-meta-top {
     display: flex; gap: 1rem; align-items: center;

@@ -4,7 +4,6 @@
 
 <section class="loc-hero">
     <div class="container">
-        <x-breadcrumb :items="$breadcrumb" />
         <h1>{{ $nombre }} con fidelización Eventify</h1>
         <p>Descubre los mejores {{ $nombre }} adheridos al programa de fidelización QR.</p>
     </div>
@@ -45,8 +44,6 @@
 @push('head')
 <style>
 .loc-hero { background: linear-gradient(135deg, #1a1a2e 0%, #6c3fc5 100%); color: #fff; padding: 3rem 0 2.5rem; }
-.loc-hero .breadcrumb-list { color: rgba(255,255,255,.7); }
-.loc-hero .breadcrumb-list a { color: rgba(255,255,255,.9); }
 .loc-hero h1 { font-size: clamp(1.75rem, 3vw, 2.5rem); font-weight: 800; margin: 1rem 0 0.5rem; }
 .loc-hero p { color: rgba(255,255,255,.85); font-size: 1.05rem; }
 .seo-text p { color: #4b5563; margin-bottom: 1rem; }

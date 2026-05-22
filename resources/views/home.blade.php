@@ -53,7 +53,7 @@
                 <div class="notif-time">ahora</div>
             </div>
             <div class="notif-text">&#x2615; 2&#x00D7;1 en café esta tarde</div>
-            <div class="notif-sub">Café El Rincón · Coslada</div>
+            <div class="notif-sub">Café Lumière · Coslada</div>
         </div>
 
         <div class="hero-float hero-float-qr">
@@ -282,7 +282,7 @@
                     <span class="pagcom-dot" style="background:#ff5f57"></span>
                     <span class="pagcom-dot" style="background:#febc2e"></span>
                     <span class="pagcom-dot" style="background:#28c840"></span>
-                    <span class="pagcom-url">app.eventify.es/comercio/cafe-el-rincon</span>
+                    <span class="pagcom-url">app.eventify.es/comercio/cafe-lumiere</span>
                 </div>
                 <div class="pagcom-screen">
                     <div class="pc2-hero-img">
@@ -293,7 +293,7 @@
                     <div class="pc2-card" style="display:flex;align-items:center;gap:10px;">
                         <div class="pc2-logo">&#x2615;</div>
                         <div>
-                            <strong style="display:block;font-size:13px;">Café El Rincón</strong>
+                            <strong style="display:block;font-size:13px;">Café Lumière</strong>
                             <span class="pc2-pill" style="background:#f3f4f6;">&#x2615; Cafetería &middot; Coslada</span>
                         </div>
                     </div>
@@ -448,7 +448,7 @@
                     <div class="tavatar">&#x2615;</div>
                     <div>
                         <div class="tname">María González</div>
-                        <div class="trole">Café El Rincón &mdash; Coslada</div>
+                        <div class="trole">Café Lumière &mdash; Coslada</div>
                     </div>
                 </div>
             </div>
@@ -511,7 +511,7 @@
 
         {{-- ADD-ONS --}}
         <div class="price-addons-wrap">
-            <div class="price-addon-sep"><span>&#x2755; &iquest;Necesitas m&aacute;s? Ampl&iacute;a sin cambiar de plan.</span></div>
+            <div class="price-addon-sep"><span>✦ ¿Necesitas más? Amplía sin cambiar de plan.</span></div>
             <div class="price-addons-grid">
                 <div class="addon-card">
                     <div class="addon-top">

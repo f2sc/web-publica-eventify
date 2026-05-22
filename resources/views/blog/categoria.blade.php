@@ -17,12 +17,6 @@
 <section class="section" style="background:#fff;">
     <div class="container">
 
-        {{-- Breadcrumb --}}
-        <x-breadcrumb :items="[
-            ['label' => 'Blog', 'url' => '/blog'],
-            ['label' => $categoria->nombre],
-        ]" />
-
         {{-- Filtros de categoría --}}
         @php
             $todasCategorias = \App\Models\CategoriaBlog::orderBy('nombre')->get();
@@ -42,7 +36,7 @@
             {{-- Artículo destacado --}}
             @php $destacado = $articulos->first(); @endphp
             <div class="blog-featured">
-                <div class="bf-img">
+                <a href="{{ url('/blog/' . $destacado->slug) }}" class="bf-img">
                     @if($destacado->imagen_principal)
                     <img src="{{ $destacado->imagen_principal }}" alt="{{ $destacado->titulo }}" loading="lazy">
                     @else
@@ -50,7 +44,7 @@
                     @endif
                     <div class="bf-img-ov"></div>
                     <div class="bf-cat">{{ $categoria->nombre }}</div>
-                </div>
+                </a>
                 <div class="bf-body">
                     <div class="bf-tag">{{ $categoria->nombre }}</div>
                     <h2><a href="{{ url('/blog/' . $destacado->slug) }}" style="color:inherit;text-decoration:none;">{{ $destacado->titulo }}</a></h2>

@@ -28,7 +28,7 @@
             {{-- Artículo destacado (primero de la lista) --}}
             @php $destacado = $articulos->first(); @endphp
             <div class="blog-featured">
-                <div class="bf-img">
+                <a href="{{ url('/blog/' . $destacado->slug) }}" class="bf-img">
                     @if($destacado->imagen_principal)
                     <img src="{{ $destacado->imagen_principal }}" alt="{{ $destacado->titulo }}" loading="lazy">
                     @else
@@ -38,7 +38,7 @@
                     @if($destacado->categoria_blog)
                     <div class="bf-cat">{{ $destacado->categoria_blog }}</div>
                     @endif
-                </div>
+                </a>
                 <div class="bf-body">
                     @if($destacado->categoria_blog)
                     <div class="bf-tag">{{ $destacado->categoria_blog }}</div>
