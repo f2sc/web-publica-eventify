@@ -54,15 +54,31 @@ class OpenAiImageProvider implements AiImageProviderInterface
         // gpt-image-2 devuelve b64_json; DALL-E 3 devuelve url
         $b64 = $response->json('data.0.b64_json') ?? null;
         if ($b64) {
-            Storage::disk('public')->put($filename, base64_decode($b64));
-        } else {
-            $url = $response->json('data.0.url') ?? null;
-            if (!$url) {
-                \Log::error('OpenAI Images respuesta inesperada', ['body' => $response->body()]);
-                throw new RuntimeException('OpenAI Images no devolvió imagen.');
+            $bytes = base64_decode($b64);
+            if (!$bytes || strlen($bytes) < 100) {
+                throw new RuntimeException('OpenAI devolvió base64 vacío o inválido.');
             }
-            $bytes = Http::timeout(30)->get($url)->body();
-            Storage::disk('public')->put($filename, $bytes);
+            $saved = Storage::disk('public')->put($filename, $bytes);
+        } else {
+            $remoteUrl = $response->json('data.0.url') ?? null;
+            if (!$remoteUrl) {
+                \Log::error('OpenAI Images respuesta inesperada', ['body' => $response->body()]);
+                throw new RuntimeException('OpenAI Images no devolvió imagen ni URL.');
+            }
+            $dlResp = Http::timeout(30)->get($remoteUrl);
+            if ($dlResp->failed()) {
+                throw new RuntimeException('No se pudo descargar la imagen desde OpenAI (HTTP ' . $dlResp->status() . ').');
+            }
+            $bytes = $dlResp->body();
+            if (!$bytes || strlen($bytes) < 100) {
+                throw new RuntimeException('La imagen descargada de OpenAI está vacía.');
+            }
+            $saved = Storage::disk('public')->put($filename, $bytes);
+        }
+
+        if (!$saved) {
+            \Log::error('OpenAI Images: no se pudo escribir en disco', ['filename' => $filename, 'disk_path' => storage_path('app/public')]);
+            throw new RuntimeException('No se pudo guardar la imagen en el servidor. Revisa los permisos del directorio storage/app/public/articulos/');
         }
 
         $this->lastCost = 0.04;

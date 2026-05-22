@@ -340,27 +340,32 @@ document.getElementById('ai-generate-btn').addEventListener('click', async () =>
     }
 });
 
+// ── Prompt de imagen ──
+function buildImagePrompt() {
+    const titulo = document.querySelector('[name="titulo"]')?.value.trim() || '';
+    const alt    = document.getElementById('image_alt')?.value.trim() || '';
+    const extr   = document.querySelector('[name="extracto"]')?.value.trim() || '';
+
+    let base;
+    if (alt) {
+        base = alt + (titulo ? '. Contexto: ' + titulo : '');
+    } else {
+        base = titulo + (extr ? '. ' + extr.slice(0, 200) : '');
+    }
+
+    // Añadir el sufijo de estilo fotográfico global de settings (si está definido en la página)
+    const style = (typeof AI_IMG_STYLE !== 'undefined' && AI_IMG_STYLE) ? AI_IMG_STYLE : '';
+    const full  = base.replace(/\.\s*$/, '') + (style ? '. ' + style : '');
+    return full;
+}
+
 // Solo imagen (artículo existente)
 document.getElementById('ai-image-btn')?.addEventListener('click', async () => {
     if (!AI_IMAGE_URL) return;
     const btn      = document.getElementById('ai-image-btn');
     const statusEl = document.getElementById('img-ai-status');
     const statusTx = document.getElementById('img-ai-status-text');
-
-    // Construir prompt desde los datos del artículo:
-    // alt-text (describe exactamente qué mostrar) + título + extracto como contexto
-    const titulo = document.querySelector('[name="titulo"]')?.value.trim() || '';
-    const alt    = document.getElementById('image_alt')?.value.trim() || '';
-    const extr   = document.querySelector('[name="extracto"]')?.value.trim() || '';
-
-    let prompt;
-    if (alt) {
-        // Si hay alt text, úsalo como descripción principal + título de contexto
-        prompt = alt + (titulo ? '. Contexto: ' + titulo : '');
-    } else {
-        // Sin alt: título + extracto (primeros 200 chars)
-        prompt = titulo + (extr ? '. ' + extr.slice(0, 200) : '');
-    }
+    const prompt   = buildImagePrompt();
 
     btn.disabled      = true;
     btn.style.opacity = '0.55';
@@ -372,9 +377,20 @@ document.getElementById('ai-image-btn')?.addEventListener('click', async () => {
         if (res.ok) {
             aiSetField('imagen_principal', res.url);
             if (typeof actualizarPreviewImagen === 'function') actualizarPreviewImagen(res.url);
-            if (statusEl) statusEl.style.color = '#059669';
-            if (statusTx) statusTx.textContent = '✓ Imagen generada.';
-            setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 4000);
+
+            // Verificar que el fichero realmente se guardó en disco
+            if (statusTx) statusTx.textContent = 'Verificando imagen...';
+            const img = new Image();
+            img.onload = () => {
+                if (statusEl) statusEl.style.color = '#059669';
+                if (statusTx) statusTx.textContent = '✓ Imagen generada y guardada.';
+                setTimeout(() => { if (statusEl) statusEl.style.display = 'none'; }, 5000);
+            };
+            img.onerror = () => {
+                if (statusEl) statusEl.style.color = '#f59e0b';
+                if (statusTx) statusTx.textContent = '⚠ URL generada pero el fichero no está accesible. Revisa permisos del disco.';
+            };
+            img.src = res.url + '?t=' + Date.now(); // cache-bust
         } else {
             if (statusEl) statusEl.style.color = '#dc2626';
             if (statusTx) statusTx.textContent = '✗ ' + (res.message || 'Error al generar imagen');
@@ -385,6 +401,33 @@ document.getElementById('ai-image-btn')?.addEventListener('click', async () => {
     } finally {
         btn.disabled      = false;
         btn.style.opacity = '1';
+    }
+});
+
+// Botón copiar prompt al portapapeles
+document.getElementById('ai-image-copy-btn')?.addEventListener('click', async () => {
+    const prompt = buildImagePrompt();
+    const btn    = document.getElementById('ai-image-copy-btn');
+    try {
+        await navigator.clipboard.writeText(prompt);
+        const orig = btn.textContent;
+        btn.textContent = '✓';
+        btn.style.color = '#059669';
+        setTimeout(() => { btn.textContent = orig; btn.style.color = '#7c3aed'; }, 2000);
+    } catch (e) {
+        // fallback para contextos sin clipboard API
+        const ta = document.createElement('textarea');
+        ta.value = prompt;
+        ta.style.position = 'fixed';
+        ta.style.opacity  = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        const orig = btn.textContent;
+        btn.textContent = '✓';
+        btn.style.color = '#059669';
+        setTimeout(() => { btn.textContent = orig; btn.style.color = '#7c3aed'; }, 2000);
     }
 });
 

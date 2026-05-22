@@ -346,15 +346,25 @@ details.sbar-card[open] .sbar-chevron { transform: rotate(180deg); }
                            value="{{ old('image_alt', $a?->image_alt) }}">
                 </div>
                 @if($a)
+                @php $aiSettings = \App\Services\AI\AiSettingsService::get(); @endphp
                 <div id="img-ai-status" style="font-size:.78rem;color:#7c3aed;display:none;align-items:center;gap:.35rem;margin-top:.35rem">
                     <span style="animation:spin 1s linear infinite;display:inline-block">⟳</span>
                     <span id="img-ai-status-text">Generando imagen...</span>
                 </div>
-                <button type="button" id="ai-image-btn"
-                    style="width:100%;justify-content:center;background:#fff;color:#6c3fc5;border:1.5px solid #c4b5fd;border-radius:7px;padding:.45rem .75rem;font-size:.82rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.4rem;margin-top:.5rem">
-                    🖼 Generar imagen con IA
-                    <small style="color:#9ca3af;font-weight:400">(coste extra)</small>
-                </button>
+                <div style="display:flex;gap:.4rem;margin-top:.5rem;align-items:stretch">
+                    <button type="button" id="ai-image-btn"
+                        style="flex:1;justify-content:center;background:#fff;color:#6c3fc5;border:1.5px solid #c4b5fd;border-radius:7px;padding:.45rem .75rem;font-size:.82rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.4rem">
+                        🖼 Generar imagen con IA
+                        <small style="color:#9ca3af;font-weight:400">(coste extra)</small>
+                    </button>
+                    <button type="button" id="ai-image-copy-btn" title="Copiar prompt al portapapeles para generarlo en ChatGPT"
+                        style="flex-shrink:0;background:#fff;color:#7c3aed;border:1.5px solid #c4b5fd;border-radius:7px;padding:.45rem .6rem;font-size:.88rem;cursor:pointer;display:flex;align-items:center">
+                        📋
+                    </button>
+                </div>
+                <script>
+                const AI_IMG_STYLE = @json($aiSettings->prompt_image ?? '');
+                </script>
                 @endif
             </div>
         </div>
