@@ -10,6 +10,7 @@ class AiGeneration extends Model
     public $timestamps = false;
     protected $table   = 'ai_generations';
     protected $guarded = [];
+    protected $casts   = ['created_at' => 'datetime'];
 
     public function articulo(): BelongsTo
     {
