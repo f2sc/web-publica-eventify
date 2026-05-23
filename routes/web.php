@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\IaConfigController;
 use App\Http\Controllers\Admin\IaLogsController;
 use App\Http\Controllers\Admin\CalendarioController;
 use App\Http\Controllers\Admin\SerieController;
+use App\Http\Controllers\Admin\SuscriptorAdminController;
 use Illuminate\Support\Facades\Route;
 
 // Páginas públicas
@@ -88,6 +89,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/tintero/articulo', [CalendarioController::class, 'crearArticuloTintero'])->name('tintero.articulo');
             Route::post('/tintero/serie',    [CalendarioController::class, 'crearSerieTintero'])->name('tintero.serie');
         });
+
+        // Suscriptores newsletter
+        Route::get('suscriptores', [SuscriptorAdminController::class, 'index'])->name('suscriptores.index');
+        Route::delete('suscriptores/{suscriptor}', [SuscriptorAdminController::class, 'destroy'])->name('suscriptores.destroy');
 
         // Series CRUD
         Route::prefix('series')->name('series.')->group(function () {

@@ -469,7 +469,8 @@ details.sbar-card[open] .sbar-chevron { transform: rotate(180deg); }
                     <label for="orden_en_serie">Orden en la serie</label>
                     <input type="number" id="orden_en_serie" name="orden_en_serie"
                            class="form-control" min="1" placeholder="1"
-                           value="{{ old('orden_en_serie', $a?->orden_en_serie) }}">
+                           value="{{ old('orden_en_serie', $a?->orden_en_serie) }}"
+                           {{ old('serie_id', $a?->serie_id) ? '' : 'disabled' }}>
                 </div>
             </div>
         </details>
@@ -606,7 +607,10 @@ function toggleNuevaCat(val) {
     if (nombre) nombre.required = val === 'nueva';
 }
 function toggleOrden(serieId) {
-    document.getElementById('orden-group').style.display = serieId ? 'block' : 'none';
+    var group = document.getElementById('orden-group');
+    var input = document.getElementById('orden_en_serie');
+    group.style.display = serieId ? 'block' : 'none';
+    input.disabled = !serieId;
 }
 
 // ——— Lightbox imagen ———
@@ -645,7 +649,21 @@ async function subirImagen(input) {
     if (slugField?.value) fd.append('article_slug', slugField.value);
 
     try {
-        const r   = await fetch(UPLOAD_URL, { method: 'POST', body: fd });
+        const r = await fetch(UPLOAD_URL, { method: 'POST', body: fd });
+
+        if (r.status === 413) {
+            status.textContent = '✗ Imagen demasiado grande para el servidor. Reduce el tamaño a menos de 2 MB.';
+            status.style.color = '#dc2626';
+            return;
+        }
+
+        const contentType = r.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            status.textContent = '✗ Error del servidor (' + r.status + '). Comprueba los logs.';
+            status.style.color = '#dc2626';
+            return;
+        }
+
         const res = await r.json();
         if (res.ok) {
             document.getElementById('imagen_principal').value = res.url;
@@ -657,7 +675,7 @@ async function subirImagen(input) {
             status.style.color = '#dc2626';
         }
     } catch (e) {
-        status.textContent = '✗ Error de red: ' + e.message;
+        status.textContent = '✗ Error al subir: ' + e.message;
         status.style.color = '#dc2626';
     } finally {
         area.style.opacity = '1';
@@ -708,6 +726,72 @@ async function subirImagen(input) {
 
     textarea.closest('form').addEventListener('submit', function () {
         textarea.value = quill.root.innerHTML;
+    });
+})();
+
+// ——— Confirmación newsletter ———
+(function () {
+    const form              = document.getElementById('article-form');
+    const estadoOriginal    = @json($a?->estado ?? null);
+    const suscriptores      = {{ $suscriptoresActivos ?? 0 }};
+    let   confirmado        = false;
+
+    form.addEventListener('submit', async function (e) {
+        if (confirmado) return;
+
+        const estadoSel   = document.getElementById('estado').value;
+        const nlCheck     = document.querySelector('input[name="enviar_newsletter"][type="checkbox"]');
+        const nlActivo    = nlCheck && nlCheck.checked;
+
+        if (!nlActivo) return;
+
+        const cambiandoAPublicado  = estadoSel === 'publicado' && estadoOriginal !== 'publicado';
+        const cambiandoAProgramado = estadoSel === 'programado' && estadoOriginal !== 'programado';
+
+        if (!cambiandoAPublicado && !cambiandoAProgramado) return;
+
+        e.preventDefault();
+
+        let titulo, texto, icono = 'question';
+        const n = suscriptores === 1 ? '1 suscriptor' : suscriptores + ' suscriptores';
+
+        if (cambiandoAPublicado) {
+            titulo = '¿Publicar y enviar newsletter?';
+            texto  = suscriptores > 0
+                ? 'Se enviará el artículo por email a <strong>' + n + '</strong> confirmados.'
+                : 'No hay suscriptores confirmados. Se publicará sin enviar emails.';
+        } else {
+            const fechaEl = document.getElementById('fecha_publicacion');
+            let fechaStr  = 'la fecha programada';
+            if (fechaEl && fechaEl.value) {
+                const d = new Date(fechaEl.value);
+                fechaStr = d.toLocaleString('es-ES', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            }
+            titulo = '¿Programar artículo?';
+            texto  = suscriptores > 0
+                ? 'El artículo se publicará el <strong>' + fechaStr + '</strong> y en ese momento se enviará a <strong>' + n + '</strong> confirmados.'
+                : 'El artículo se publicará el <strong>' + fechaStr + '</strong>. No hay suscriptores confirmados aún.';
+        }
+
+        const result = await Swal.fire({
+            title:             titulo,
+            html:              texto,
+            icon:              icono,
+            showCancelButton:  true,
+            confirmButtonText: cambiandoAPublicado ? 'Sí, publicar y enviar' : 'Sí, programar',
+            cancelButtonText:  'Cancelar',
+            confirmButtonColor: '#6c3fc5',
+        });
+
+        if (result.isConfirmed) {
+            // Copiar contenido Quill antes del submit manual
+            const textarea = document.getElementById('contenido');
+            if (textarea && window.quillEditor) {
+                textarea.value = window.quillEditor.root.innerHTML;
+            }
+            confirmado = true;
+            form.submit();
+        }
     });
 })();
 </script>

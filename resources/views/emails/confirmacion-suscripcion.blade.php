@@ -14,7 +14,7 @@
 
         {{-- Header --}}
         <tr>
-          <td style="background:linear-gradient(135deg,#6d007e,#b12140);padding:32px 40px;text-align:center;">
+          <td bgcolor="#6d007e" style="background-color:#6d007e;background:linear-gradient(135deg,#6d007e,#b12140);padding:32px 40px;text-align:center;">
             <p style="margin:0;font-size:22px;font-weight:900;color:#ffffff;letter-spacing:-0.5px;">Eventify</p>
             <p style="margin:8px 0 0;font-size:13px;color:rgba(255,255,255,.75);">Blog de comercio local</p>
           </td>
@@ -32,7 +32,7 @@
               <tr>
                 <td align="center" style="padding:8px 0 32px;">
                   <a href="{{ url('/newsletter/confirmar/' . $suscriptor->token_confirmacion) }}"
-                     style="display:inline-block;background:linear-gradient(135deg,#6d007e,#b12140);color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:10px;">
+                     style="display:inline-block;background-color:#6d007e;background:linear-gradient(135deg,#6d007e,#b12140);color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:10px;">
                     ✅ Confirmar mi suscripción
                   </a>
                 </td>

@@ -251,6 +251,8 @@
 </section>
 @endif
 
+<x-newsletter-cta fuente="articulo-newsletter" />
+
 @endsection
 
 @push('head')

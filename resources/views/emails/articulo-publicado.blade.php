@@ -12,27 +12,30 @@
     <td align="center">
       <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(109,0,126,.08);">
 
+        {{-- Header con gradiente — bgcolor para Outlook, style para el resto --}}
         <tr>
-          <td style="background:linear-gradient(135deg,#6d007e,#b12140);padding:32px 40px;text-align:center;">
+          <td bgcolor="#6d007e" style="background-color:#6d007e;background:linear-gradient(135deg,#6d007e,#b12140);padding:32px 40px;text-align:center;">
             <p style="margin:0;font-size:22px;font-weight:900;color:#ffffff;letter-spacing:-0.5px;">Eventify</p>
             <p style="margin:8px 0 0;font-size:13px;color:rgba(255,255,255,.75);">Blog de comercio local</p>
           </td>
         </tr>
 
+        {{-- Imagen del artículo --}}
         @if($articulo->imagen_principal)
         <tr>
-          <td style="padding:0;">
+          <td style="padding:0;line-height:0;">
             <img src="{{ $articulo->imagen_principal }}" alt="{{ $articulo->image_alt ?? $articulo->titulo }}"
-                 style="width:100%;max-height:240px;object-fit:cover;display:block;">
+                 width="560" style="width:100%;max-height:260px;object-fit:cover;display:block;">
           </td>
         </tr>
         @endif
 
+        {{-- Cuerpo --}}
         <tr>
           <td style="padding:40px 40px 32px;">
-            @if($articulo->categoria_blog)
+            @if($articulo->categoriaBlog)
             <p style="margin:0 0 8px;font-size:11px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:.08em;">
-              {{ $articulo->categoria_blog }}
+              {{ $articulo->categoriaBlog->nombre }}
             </p>
             @endif
 
@@ -50,8 +53,8 @@
               <tr>
                 <td align="center" style="padding-bottom:32px;">
                   <a href="{{ url('/blog/' . $articulo->slug) }}"
-                     style="display:inline-block;background:linear-gradient(135deg,#6d007e,#b12140);color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:10px;">
-                    Leer el artículo →
+                     style="display:inline-block;background-color:#6d007e;background:linear-gradient(135deg,#6d007e,#b12140);color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:10px;">
+                    Leer el artículo &rarr;
                   </a>
                 </td>
               </tr>
@@ -63,13 +66,14 @@
           </td>
         </tr>
 
+        {{-- Footer --}}
         <tr>
-          <td style="background:#f9f5ff;padding:20px 40px;border-top:1px solid #ede9fe;">
+          <td bgcolor="#f9f5ff" style="background-color:#f9f5ff;padding:20px 40px;border-top:1px solid #ede9fe;">
             <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">
-              © {{ date('Y') }} Eventify &mdash;
-              <a href="{{ url('/privacidad') }}" style="color:#6d007e;">Privacidad</a>
+              &copy; {{ date('Y') }} Eventify &mdash;
+              <a href="{{ url('/privacidad') }}" style="color:#6d007e;text-decoration:none;">Privacidad</a>
               &mdash;
-              <a href="{{ url('/newsletter/cancelar/' . $suscriptor->token_confirmacion) }}" style="color:#6d007e;">Darme de baja</a>
+              <a href="{{ url('/newsletter/cancelar/' . $suscriptor->token_confirmacion) }}" style="color:#6d007e;text-decoration:none;">Darme de baja</a>
             </p>
           </td>
         </tr>

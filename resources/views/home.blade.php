@@ -612,6 +612,8 @@
 </section>
 @endif
 
+<x-newsletter-cta fuente="home-newsletter" />
+
 {{-- CTA FINAL SPLIT --}}
 <div class="cta-final-split">
     <div class="cta-left">

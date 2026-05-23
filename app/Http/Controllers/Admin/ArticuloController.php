@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\EnviarNewsletterArticulo;
 use App\Models\Articulo;
 use App\Models\CategoriaBlog;
+use App\Models\Suscriptor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 
 class ArticuloController extends Controller
@@ -19,9 +22,10 @@ class ArticuloController extends Controller
 
     public function create()
     {
-        $categorias = CategoriaBlog::orderBy('nombre')->get();
-        $series     = \App\Models\Serie::orderBy('nombre')->get();
-        return view('admin.articulos.create', compact('categorias', 'series'));
+        $categorias          = CategoriaBlog::orderBy('nombre')->get();
+        $series              = \App\Models\Serie::orderBy('nombre')->get();
+        $suscriptoresActivos = Suscriptor::where('confirmado', true)->whereNull('unsubscribed_at')->count();
+        return view('admin.articulos.create', compact('categorias', 'series', 'suscriptoresActivos'));
     }
 
     public function store(Request $request)
@@ -31,7 +35,13 @@ class ArticuloController extends Controller
 
         $data = $this->resolverCategoria($request, $data);
 
-        Articulo::create($data);
+        $data = $this->normalizarEstado($data);
+
+        $articulo = Articulo::create($data);
+
+        if ($data['estado'] === 'publicado' && !empty($data['enviar_newsletter'])) {
+            dispatch(new EnviarNewsletterArticulo($articulo));
+        }
 
         return redirect()->route('admin.articulos.index')
             ->with('success', 'Artículo creado correctamente.');
@@ -44,9 +54,10 @@ class ArticuloController extends Controller
 
     public function edit(Articulo $articulo)
     {
-        $categorias = CategoriaBlog::orderBy('nombre')->get();
-        $series     = \App\Models\Serie::orderBy('nombre')->get();
-        return view('admin.articulos.edit', compact('articulo', 'categorias', 'series'));
+        $categorias          = CategoriaBlog::orderBy('nombre')->get();
+        $series              = \App\Models\Serie::orderBy('nombre')->get();
+        $suscriptoresActivos = Suscriptor::where('confirmado', true)->whereNull('unsubscribed_at')->count();
+        return view('admin.articulos.edit', compact('articulo', 'categorias', 'series', 'suscriptoresActivos'));
     }
 
     public function update(Request $request, Articulo $articulo)
@@ -56,7 +67,16 @@ class ArticuloController extends Controller
 
         $data = $this->resolverCategoria($request, $data);
 
+        $data = $this->normalizarEstado($data);
+
+        $estadoAnterior = $articulo->estado;
         $articulo->update($data);
+
+        if ($data['estado'] === 'publicado'
+            && $estadoAnterior !== 'publicado'
+            && !empty($data['enviar_newsletter'])) {
+            dispatch(new EnviarNewsletterArticulo($articulo->fresh()));
+        }
 
         return redirect()->route('admin.articulos.index')
             ->with('success', 'Artículo actualizado correctamente.');
@@ -186,6 +206,18 @@ class ArticuloController extends Controller
         } else {
             $data['categoria_blog_id'] = null;
             $data['categoria_blog']    = null;
+        }
+
+        return $data;
+    }
+
+    private function normalizarEstado(array $data): array
+    {
+        // publicado + fecha futura → programado (el cron lo publicará y enviará newsletter)
+        if ($data['estado'] === 'publicado'
+            && !empty($data['fecha_publicacion'])
+            && now()->lt(\Carbon\Carbon::parse($data['fecha_publicacion']))) {
+            $data['estado'] = 'programado';
         }
 
         return $data;

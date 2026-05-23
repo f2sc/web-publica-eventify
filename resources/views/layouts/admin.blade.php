@@ -29,6 +29,7 @@
                         <li><a href="{{ route('admin.calendario.index') }}" class="{{ request()->is('admin/calendario*') ? 'active' : '' }}">📅 Calendario</a></li>
                         <li><a href="{{ route('admin.articulos.index') }}" class="{{ request()->is('admin/articulos*') && !request()->is('admin/articulos/*/ai*') ? 'active' : '' }}">Artículos</a></li>
                         <li><a href="{{ route('admin.categorias.index') }}" class="{{ request()->is('admin/categorias*') ? 'active' : '' }}">Categorías</a></li>
+                        <li><a href="{{ route('admin.suscriptores.index') }}" class="{{ request()->is('admin/suscriptores*') ? 'active' : '' }}">📬 Suscriptores</a></li>
                         <li><a href="{{ route('admin.ia.config') }}" class="{{ request()->is('admin/ia*') ? 'active' : '' }}">✦ Configuración IA</a></li>
                     </ul>
                 </nav>
@@ -52,6 +53,7 @@
         @yield('content')
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     @stack('scripts')
 <script>
 (function () {

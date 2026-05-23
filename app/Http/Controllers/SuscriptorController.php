@@ -25,9 +25,15 @@ class SuscriptorController extends Controller
         $existente = Suscriptor::where('email', $email)->first();
 
         if ($existente) {
+            // Dado de baja: reactivar sin pedir confirmación (ya verificó el email antes)
+            if ($existente->unsubscribed_at) {
+                $existente->update(['unsubscribed_at' => null]);
+                return back()->with('newsletter_status', 'reactivado');
+            }
             if ($existente->confirmado) {
                 return back()->with('newsletter_status', 'ya_suscrito');
             }
+            // Pendiente de confirmar: reenviar email de confirmación
             try {
                 Mail::to($existente->email)->send(new ConfirmacionSuscripcion($existente));
             } catch (\Throwable $e) {
