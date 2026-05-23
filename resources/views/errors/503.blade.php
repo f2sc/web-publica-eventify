@@ -1,6 +1,6 @@
 @extends('layouts.app', [
-    'title'       => 'Servicio temporalmente no disponible',
-    'description' => 'Estamos teniendo problemas técnicos. Vuelve en unos minutos.',
+    'title'       => 'Volvemos enseguida',
+    'description' => 'La web estará disponible en unos segundos.',
     'canonical'   => url()->current(),
     'indexable'   => false,
 ])
@@ -9,11 +9,11 @@
 <section class="error-page">
     <div class="container">
         <div class="error-content">
-            <div class="error-code">503</div>
-            <h1>Servicio temporalmente no disponible</h1>
-            <p>Estamos experimentando problemas técnicos. Por favor, vuelve en unos minutos.</p>
+            <div class="error-code" style="font-size:3rem">🔧</div>
+            <h1>Volvemos enseguida</h1>
+            <p>Estamos actualizando la web con novedades. Estará lista en unos segundos — recarga la página.</p>
             <div class="error-actions">
-                <a href="{{ url('/') }}" class="btn btn-primary">Ir al inicio</a>
+                <a href="{{ url('/') }}" class="btn btn-primary">Recargar</a>
             </div>
         </div>
     </div>
