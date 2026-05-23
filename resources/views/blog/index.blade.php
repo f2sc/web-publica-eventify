@@ -52,7 +52,7 @@
                         <div>
                             <div class="bf-author">{{ $destacado->autor ?? 'Equipo Eventify' }}</div>
                             @if($destacado->fecha_publicacion)
-                            <div class="bf-date">{{ $destacado->fecha_publicacion->format('d M Y') }}</div>
+                            <div class="bf-date">{{ $destacado->fecha_publicacion->translatedFormat('d M Y') }}</div>
                             @endif
                         </div>
                         <div class="bf-readtime">&#x23F1; {{ $destacado->tiempoLectura() }} min</div>
@@ -84,7 +84,7 @@
                             <span>{{ $articulo->autor ?? 'Equipo Eventify' }}</span>
                             <span class="blog-card-meta-right">
                                 @if($articulo->fecha_publicacion)
-                                <time datetime="{{ $articulo->fecha_publicacion->toDateString() }}">{{ $articulo->fecha_publicacion->format('d M') }}</time>
+                                <time datetime="{{ $articulo->fecha_publicacion->toDateString() }}">{{ $articulo->fecha_publicacion->translatedFormat('d M') }}</time>
                                 @endif
                                 <span class="blog-readtime">{{ $articulo->tiempoLectura() }} min</span>
                             </span>

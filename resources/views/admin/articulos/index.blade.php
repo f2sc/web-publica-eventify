@@ -118,7 +118,8 @@
                 {{-- Fecha --}}
                 <td style="vertical-align:middle;font-size:.85rem">
                     @if($articulo->fecha_publicacion)
-                    {{ $articulo->fecha_publicacion->format('d/m/Y') }}
+                    {{ $articulo->fecha_publicacion->format('d/m/Y') }}<br>
+                    <span style="color:#9ca3af;font-size:.8rem">{{ $articulo->fecha_publicacion->format('H:i') }}</span>
                     @else
                     <span style="color:#9ca3af">—</span>
                     @endif
