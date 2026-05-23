@@ -3,9 +3,9 @@
 @section('title', 'Configuración IA')
 
 @section('content')
-<div class="admin-header">
-    <h1>✦ Configuración de IA</h1>
-    <p style="color:#6b7280;margin-top:.25rem">Proveedores, modelos, API keys y prompts del asistente editorial.</p>
+<div class="page-header" style="flex-direction:column;align-items:flex-start;gap:.25rem;margin-bottom:1.5rem">
+    <h1 class="page-title">✦ Configuración de IA</h1>
+    <p style="color:#6b7280;font-size:.9rem">Proveedores, modelos, API keys y prompts del asistente editorial.</p>
 </div>
 
 @if(session('success'))

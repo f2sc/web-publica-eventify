@@ -5,15 +5,23 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f3f4f6; colo
 .admin-header-inner { max-width: 1140px; width: 100%; margin: 0 auto; display: flex; align-items: center; gap: 2rem; }
 .admin-logo { font-weight: 700; font-size: 1.1rem; color: #fff; text-decoration: none; }
 .admin-logo span { color: #a78bfa; }
-.admin-nav { display: flex; gap: 1.5rem; margin-left: auto; }
+.admin-nav-wrapper { display: flex; align-items: center; gap: 2rem; margin-left: auto; }
+.admin-nav { display: flex; gap: 1.5rem; list-style: none; }
 .admin-nav a { color: #d1d5db; font-size: 0.9rem; text-decoration: none; transition: color .2s; }
 .admin-nav a:hover, .admin-nav a.active { color: #fff; }
 .admin-logout button { background: none; border: 1px solid #4b5563; color: #d1d5db; padding: 0.3rem 0.75rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all .2s; }
 .admin-logout button:hover { background: #374151; color: #fff; }
 
+/* Hamburguesa — oculto en escritorio */
+.admin-nav-toggle { display: none; flex-direction: column; justify-content: center; gap: 5px; background: none; border: none; cursor: pointer; padding: 6px; margin-left: auto; }
+.admin-nav-toggle span { display: block; width: 22px; height: 2px; background: #d1d5db; border-radius: 2px; transition: all .25s; }
+.admin-nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.admin-nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.admin-nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
 .admin-main { max-width: 1140px; margin: 2rem auto; padding: 0 1.25rem; }
 
-.card { background: #fff; border-radius: 10px; border: 1px solid #e5e7eb; padding: 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+.card, .admin-card { background: #fff; border-radius: 10px; border: 1px solid #e5e7eb; padding: 1.5rem; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
 .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
 .page-title { font-size: 1.4rem; font-weight: 700; }
 
@@ -50,7 +58,55 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f3f4f6; colo
 .login-box h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
 .login-box p { color: #6b7280; font-size: 0.9rem; margin-bottom: 2rem; }
 
-@media (max-width: 640px) {
-    .form-row { grid-template-columns: 1fr; }
+/* ── Responsive admin ── */
+@media (max-width: 768px) {
+    /* Header */
+    .admin-header { padding: 0 1rem; }
+    .admin-header-inner { position: relative; }
+    .admin-nav-toggle { display: flex; }
+
+    /* Menú desplegable */
+    .admin-nav-wrapper {
+        display: none; flex-direction: column; align-items: flex-start; gap: 0;
+        position: absolute; top: 56px; left: 0; right: 0;
+        background: #1a1a2e; border-top: 1px solid #2d2d4e;
+        padding: 1rem 1.25rem 1.25rem; margin-left: 0; z-index: 100;
+    }
+    .admin-nav-wrapper.open { display: flex; }
+    .admin-nav { flex-direction: column; gap: 0; width: 100%; }
+    .admin-nav li { border-bottom: 1px solid #2d2d4e; }
+    .admin-nav a { display: block; padding: 0.75rem 0; font-size: 0.95rem; }
+    .admin-logout { margin-top: 1rem; width: 100%; }
+    .admin-logout button { width: 100%; text-align: center; padding: 0.5rem; }
+
+    /* Layout */
+    .admin-main { margin: 1rem auto; padding: 0 0.75rem; }
+    .card { padding: 0.75rem; border-radius: 8px; }
     .page-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    .page-header .btn { width: 100%; justify-content: center; }
+
+    /* Tabla: scroll horizontal para mantener todo */
+    .card { overflow-x: auto; }
+    .table { font-size: 0.8rem; min-width: 480px; }
+    .table th, .table td { padding: 0.5rem 0.4rem; }
+
+    /* Miniatura más pequeña */
+    .art-thumb, .art-thumb-empty { width: 38px; height: 38px; }
+
+    /* Acciones más compactas */
+    .act-btns { gap: 0.15rem; }
+    .act-btn { width: 26px; height: 26px; font-size: 0.78rem; }
+
+    /* Estado selector compacto */
+    .estado-sel { font-size: 0.7rem; padding: .15rem .45rem; padding-right: 1.1rem; }
+
+    /* Forms */
+    .form-row { grid-template-columns: 1fr; }
+    .form-control { font-size: 0.9rem; }
+
+    /* Logs IA */
+    .logs-stats-grid { grid-template-columns: 1fr !important; }
+
+    /* Config IA — admin-card padding */
+    .admin-card { padding: 1rem; }
 }

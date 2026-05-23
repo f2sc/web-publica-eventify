@@ -20,18 +20,23 @@
             <a href="{{ route('admin.articulos.index') }}" class="admin-logo">
                 Eventify <span>Admin</span>
             </a>
-            <nav aria-label="Menú admin">
-                <ul class="admin-nav">
-                    <li><a href="{{ route('admin.calendario.index') }}" class="{{ request()->is('admin/calendario*') ? 'active' : '' }}">📅 Calendario</a></li>
-                    <li><a href="{{ route('admin.articulos.index') }}" class="{{ request()->is('admin/articulos*') && !request()->is('admin/articulos/*/ai*') ? 'active' : '' }}">Artículos</a></li>
-                    <li><a href="{{ route('admin.categorias.index') }}" class="{{ request()->is('admin/categorias*') ? 'active' : '' }}">Categorías</a></li>
-                    <li><a href="{{ route('admin.ia.config') }}" class="{{ request()->is('admin/ia*') ? 'active' : '' }}">✦ Configuración IA</a></li>
-                </ul>
-            </nav>
-            <form action="{{ route('admin.logout') }}" method="POST" class="admin-logout">
-                @csrf
-                <button type="submit">Cerrar sesión</button>
-            </form>
+            <button class="admin-nav-toggle" id="adminNavToggle" aria-expanded="false" aria-label="Abrir menú">
+                <span></span><span></span><span></span>
+            </button>
+            <div class="admin-nav-wrapper" id="adminNavMenu">
+                <nav aria-label="Menú admin">
+                    <ul class="admin-nav">
+                        <li><a href="{{ route('admin.calendario.index') }}" class="{{ request()->is('admin/calendario*') ? 'active' : '' }}">📅 Calendario</a></li>
+                        <li><a href="{{ route('admin.articulos.index') }}" class="{{ request()->is('admin/articulos*') && !request()->is('admin/articulos/*/ai*') ? 'active' : '' }}">Artículos</a></li>
+                        <li><a href="{{ route('admin.categorias.index') }}" class="{{ request()->is('admin/categorias*') ? 'active' : '' }}">Categorías</a></li>
+                        <li><a href="{{ route('admin.ia.config') }}" class="{{ request()->is('admin/ia*') ? 'active' : '' }}">✦ Configuración IA</a></li>
+                    </ul>
+                </nav>
+                <form action="{{ route('admin.logout') }}" method="POST" class="admin-logout">
+                    @csrf
+                    <button type="submit">Cerrar sesión</button>
+                </form>
+            </div>
         </div>
     </header>
     @endif
@@ -48,5 +53,16 @@
     </main>
 
     @stack('scripts')
+<script>
+(function () {
+    var btn = document.getElementById('adminNavToggle');
+    var menu = document.getElementById('adminNavMenu');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+        var open = menu.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open);
+    });
+})();
+</script>
 </body>
 </html>

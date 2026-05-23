@@ -139,6 +139,19 @@
 .cal-pop-btn { display:block; text-align:left; width:100%; background:#f9fafb; border:1px solid #e5e7eb; border-radius:6px; padding:.4rem .65rem; font-size:.78rem; cursor:pointer; text-decoration:none; color:#374151; }
 .cal-pop-btn:hover { background:#f3f4f6; }
 .cal-pop-btn.danger { background:#fef2f2; border-color:#fecaca; color:#dc2626; }
+
+/* ─── Responsive calendario ───────────────────── */
+@media (max-width: 768px) {
+    .cal-wrap { grid-template-columns: 1fr; height: auto; overflow: visible; }
+    .cal-sidebar { border-right: none; border-bottom: 1px solid #e5e7eb; max-height: 420px; overflow-y: auto; }
+    .cal-main { height: calc(100vh - 56px); overflow: hidden; display: flex; flex-direction: column; }
+    .cal-grid-wrap { flex: 1; overflow-y: auto; }
+    .cal-cell { min-height: 60px; padding: .2rem; }
+    .cal-day-hdr { font-size: .65rem; padding: .2rem 0; }
+    .cal-ev { font-size: .62rem; padding: 1px 3px; }
+    .cal-ev-time { display: none; }
+    .ia-row { grid-template-columns: 1fr; }
+}
 </style>
 @endpush
 
