@@ -15,7 +15,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('app:publicar-articulos-programados')->hourly();
+        $schedule->command('app:publicar-articulos-programados')->everyMinute();
     }
 
     /**
