@@ -28,6 +28,7 @@ class BlogController extends Controller
             'canonical'   => url('/blog'),
             'schema'      => $schema,
             'articulos'   => $articulos,
+            'paginator'   => $articulos,
         ]);
     }
 
@@ -194,6 +195,7 @@ class BlogController extends Controller
             'ogImage'     => $categoria->og_image ?? null,
             'categoria'   => $categoria,
             'articulos'   => $articulos,
+            'paginator'   => $articulos,
         ]);
     }
 }

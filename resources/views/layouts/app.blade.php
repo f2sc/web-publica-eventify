@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <meta name="google-site-verification" content="cx_TUKZU4cTiI00PbrqqMpL0FJV4JfDLXwCewraVEzM">
     <x-seo-head
         :title="$title ?? 'Inicio'"
         :description="$description ?? 'Eventify — Fidelización QR para el comercio local'"
@@ -8,6 +9,7 @@
         :schema="$schema ?? null"
         :indexable="$indexable ?? true"
         :ogImage="$ogImage ?? null"
+        :paginator="$paginator ?? null"
     />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

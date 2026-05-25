@@ -6,6 +6,7 @@
     'indexable'  => true,
     'ogImage'    => null,
     'ogType'     => 'website',
+    'paginator'  => null,
 ])
 
 @php
@@ -19,6 +20,14 @@
 <title>{{ $fullTitle }}</title>
 <meta name="description" content="{{ $description }}">
 <link rel="canonical" href="{{ $canonical }}">
+@if($paginator)
+    @if($paginator->currentPage() > 1)
+    <link rel="prev" href="{{ $paginator->previousPageUrl() }}">
+    @endif
+    @if($paginator->hasMorePages())
+    <link rel="next" href="{{ $paginator->nextPageUrl() }}">
+    @endif
+@endif
 @if(! $indexable)
 <meta name="robots" content="noindex, nofollow">
 @endif
