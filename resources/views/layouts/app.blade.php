@@ -1,6 +1,22 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- Google tag (gtag.js) — Consent Mode v2 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4XCX84X3N6"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('consent', 'default', {
+        analytics_storage: 'denied',
+        ad_storage: 'denied',
+        wait_for_update: 500
+      });
+      gtag('js', new Date());
+      gtag('config', 'G-4XCX84X3N6');
+      if (localStorage.getItem('cookie_consent') === 'accepted') {
+        gtag('consent', 'update', { analytics_storage: 'granted' });
+      }
+    </script>
     <meta name="google-site-verification" content="cx_TUKZU4cTiI00PbrqqMpL0FJV4JfDLXwCewraVEzM">
     <x-seo-head
         :title="$title ?? 'Inicio'"
@@ -27,6 +43,7 @@
     </main>
 
     <x-footer />
+    <x-cookie-banner />
 
     @stack('scripts')
 </body>

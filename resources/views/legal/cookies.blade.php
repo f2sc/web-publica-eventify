@@ -18,11 +18,19 @@
             <p>Las cookies son pequeños archivos de texto que los sitios web almacenan en tu navegador para recordar preferencias o analizar el uso del sitio.</p>
 
             <h2>Cookies que utilizamos</h2>
-            <p>Este sitio web utiliza únicamente cookies técnicas imprescindibles para el funcionamiento de la plataforma:</p>
+
+            <h3 style="font-size:1rem;font-weight:700;color:var(--navy);margin:1.5rem 0 .4rem;">Cookies técnicas (siempre activas)</h3>
+            <p>Imprescindibles para el funcionamiento del sitio. No requieren consentimiento.</p>
             <ul>
-                <li><strong>Sesión (XSRF-TOKEN, laravel_session)</strong> — necesarias para la seguridad del sitio. No recogen datos personales. Se eliminan al cerrar el navegador.</li>
+                <li><strong>XSRF-TOKEN, laravel_session</strong> — seguridad y sesión. Se eliminan al cerrar el navegador.</li>
             </ul>
-            <p>No utilizamos cookies de publicidad ni de seguimiento de terceros.</p>
+
+            <h3 style="font-size:1rem;font-weight:700;color:var(--navy);margin:1.5rem 0 .4rem;">Cookies analíticas (requieren consentimiento)</h3>
+            <p>Solo se activan si aceptas desde el aviso de cookies. Nos ayudan a entender cómo se usa la web para mejorarla.</p>
+            <ul>
+                <li><strong>Google Analytics 4</strong> (_ga, _ga_*) — mide visitas, páginas vistas y origen del tráfico de forma anonimizada. Los datos se almacenan en servidores de Google. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Política de privacidad de Google</a>.</li>
+            </ul>
+            <p>No utilizamos cookies de publicidad ni de remarketing.</p>
 
             <h2>Cómo gestionar las cookies</h2>
             <p>Puedes configurar tu navegador para bloquear o eliminar cookies. Ten en cuenta que bloquear las cookies técnicas puede afectar al funcionamiento del sitio. Consulta la ayuda de tu navegador:</p>
