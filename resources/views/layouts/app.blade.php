@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    @if(app()->isProduction())
     <!-- Google tag (gtag.js) — Consent Mode v2 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-4XCX84X3N6"></script>
     <script>
@@ -17,6 +18,7 @@
         gtag('consent', 'update', { analytics_storage: 'granted' });
       }
     </script>
+    @endif
     <meta name="google-site-verification" content="cx_TUKZU4cTiI00PbrqqMpL0FJV4JfDLXwCewraVEzM">
     <x-seo-head
         :title="$title ?? 'Inicio'"
@@ -43,7 +45,9 @@
     </main>
 
     <x-footer />
+    @if(app()->isProduction())
     <x-cookie-banner />
+    @endif
 
     @stack('scripts')
 </body>
